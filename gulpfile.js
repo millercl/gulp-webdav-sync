@@ -3,15 +3,20 @@ var dav = require( './index.js' )
 var gulp = require( 'gulp' )
 var jscs = require( 'gulp-jscs' )
 var jshint = require( 'gulp-jshint' )
+var npm = require( 'npm' )
 var stylish = require( 'jshint-stylish' )
 
 gulp.task( 'default', [ 'debug' ] )
 gulp.task( 'test', [ 'jshint', 'jscs' ] )
 
 gulp.task( 'debug', function () {
-  gulp.src( '*' )
-    .pipe( dav() )
-    .pipe( debug() )
+  npm.load( null, function () {
+    var uri = npm.config.sources.project.data.dav
+    gulp.src( '*' )
+      .pipe( debug( { title: 'pre' } ) )
+      .pipe( dav( uri ) )
+      .pipe( debug( { title: 'post' } ) )
+  } )
 } )
 
 gulp.task( 'jshint', function () {
