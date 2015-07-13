@@ -3,7 +3,10 @@
   "version": "0.0.1",
   "description": "Put files and folders on a WebDAV server.",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "test": "mocha",
+    "posttest": "gulp src-test"
+  },
   "keywords": [
     "gulpplugin",
     "webdav",
@@ -17,7 +20,9 @@
     "jshint-stylish": "~2.0.1",
     "gulp-jshint": "~1.11.2",
     "gulp-jscs": "~1.6.0",
-    "npm": "~2.13.0"
+    "npm": "~2.13.0",
+    "mocha": "~2.2.5",
+    "run-sequence": "~1.1.1"
   },
   "dependencies": {
     "through2": "~2.0.0",

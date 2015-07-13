@@ -4,19 +4,30 @@ var gulp = require( 'gulp' )
 var jscs = require( 'gulp-jscs' )
 var jshint = require( 'gulp-jshint' )
 var npm = require( 'npm' )
+var runSequence = require( 'run-sequence' )
 var stylish = require( 'jshint-stylish' )
 
-gulp.task( 'default', [ 'debug' ] )
-gulp.task( 'test', [ 'jshint', 'jscs' ] )
+gulp.task( 'default', [ 'int-test' ] )
+gulp.task( 'src-test', [ 'jshint', 'jscs' ] )
+
+gulp.task( 'int-test', function ( callback ) {
+  runSequence( 'npm.load', 'debug', callback )
+} )
+
+gulp.task( 'npm.load', function ( callback ) {
+  if ( !npm.config.loaded ) {
+    npm.load( null, function () {
+      callback()
+    } )
+  }
+} )
 
 gulp.task( 'debug', function () {
-  npm.load( null, function () {
-    var uri = npm.config.sources.project.data.dav
-    gulp.src( '*' )
-      .pipe( debug( { title: 'pre' } ) )
-      .pipe( dav( uri ) )
-      .pipe( debug( { title: 'post' } ) )
-  } )
+  var uri = npm.config.sources.project.data.dav
+  return gulp.src( '*' )
+    .pipe( debug( { title: 'pre' } ) )
+    .pipe( dav( uri ) )
+    .pipe( debug( { title: 'post' } ) )
 } )
 
 gulp.task( 'jshint', function () {
