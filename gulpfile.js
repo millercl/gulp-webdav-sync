@@ -44,7 +44,7 @@ gulp.task( 'jshint', function () {
     , newcap: true
     , node: true
   }
-  return gulp.src( '*.js' )
+  return gulp.src( [ '*.js', 'test/*.js' ] )
     .pipe( jshint( options ) )
     .pipe( jshint.reporter( 'jshint-stylish' ) )
 } )
@@ -151,6 +151,6 @@ gulp.task( 'jscs', function () {
     , 'validateParameterSeparator': ', '
     , 'validateQuoteMarks': '\''
   }
-  return gulp.src( '*.js' )
+  return gulp.src( [ '*.js', 'test/*.js' ] )
     .pipe( jscs( options ) )
 } )
