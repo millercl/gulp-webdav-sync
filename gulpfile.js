@@ -23,8 +23,13 @@ gulp.task( 'npm.load', function ( callback ) {
 } )
 
 gulp.task( 'debug', function () {
-  var uri = npm.config.sources.project.data.dav
-  return gulp.src( '*' )
+  if ( npm.config.sources.user ) {
+    uri = npm.config.sources.user.data.dav
+  }
+  if ( npm.config.sources.project ) {
+    uri = npm.config.sources.project.data.dav
+  }
+  return gulp.src( 'test/assets/*' )
     .pipe( debug( { title: 'pre' } ) )
     .pipe( dav( uri ) )
     .pipe( debug( { title: 'post' } ) )
