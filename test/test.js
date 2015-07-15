@@ -24,8 +24,8 @@ describe( PLUGIN_NAME, function () {
       }
       var uri = url.parse( HREF )
       var opt = { node: node }
-      var srv = dav.createServer( opt, uri.port, uri.hostname )
-      process.nextTick( function () {
+      var srv = dav.mount( opt )
+      srv.listen( uri.port, uri.hostname, function () {
         done()
       } )
     } )
@@ -34,6 +34,7 @@ describe( PLUGIN_NAME, function () {
     del( path.join( node, '*' ) )
   } )
   after( function () {
+    del( path.join( node, '**' ) )
     if ( fs.existsSync( node ) ) {
       fs.rmdirSync( node )
     }
