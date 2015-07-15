@@ -1,6 +1,7 @@
 var assert = require( 'assert' )
 var dav = require( 'jsDAV' )
 var del = require( 'del' )
+var es = require( 'event-stream' )
 var fs = require( 'fs' )
 var npm = require( 'npm' )
 var os = require( 'os' )
@@ -39,7 +40,22 @@ describe( PLUGIN_NAME, function () {
   } )
 
   describe( '#mkdir', function () {
-    it( 'Should create a directory on the server when vinyl.isNull().'
+    it( 'Should create a file on the server when vinyl.isBuffer()'
+      , function ( done ) {
+          var expected_path = path.join( node, MOCK )
+          var mock = new Vinyl( { path: MOCK, contents: new Buffer( MOCK ) } )
+          assert( mock.isBuffer(), 'vinyl.isBuffer()' )
+          unit( HREF ).write( mock, null, validate )
+          function validate() {
+            assert( fs.existsSync( expected_path ), 'file exists' )
+            done()
+          }
+        }
+    )
+  } )
+
+  describe( '#mkdir', function () {
+    it( 'Should create a directory on the server when vinyl.isNull()'
       , function ( done ) {
           var expected_path = path.join( node, MOCK )
           var mock = new Vinyl( { path: MOCK } )
@@ -47,6 +63,22 @@ describe( PLUGIN_NAME, function () {
           unit( HREF ).write( mock, null, validate )
           function validate() {
             assert( fs.existsSync( expected_path ), 'directory exists' )
+            done()
+          }
+        }
+    )
+  } )
+
+  describe( '#mkdir', function () {
+    it( 'Should create a file on the server when vinyl.isStream()'
+      , function ( done ) {
+          var expected_path = path.join( node, MOCK )
+          var mock = new Vinyl
+            ( { path: MOCK , contents: es.readArray( [ MOCK ] ) } )
+          assert( mock.isStream(), 'vinyl.isStream()' )
+          unit( HREF ).write( mock, null, validate )
+          function validate() {
+            assert( fs.existsSync( expected_path ), 'file exists' )
             done()
           }
         }
