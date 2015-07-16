@@ -19,7 +19,7 @@ module.exports = function ( i ) {
     }
 
     if ( vinyl.isBuffer() ) {
-      put( uri, vinyl, function ( res ) {
+      _put( uri, vinyl, function ( res ) {
         report( res )
         callback()
       } )
@@ -28,7 +28,7 @@ module.exports = function ( i ) {
     }
 
     if ( vinyl.isNull() ) {
-      mkdir( uri, function ( res ) {
+      _mkdir( uri, function ( res ) {
         report( res )
         callback()
       } )
@@ -37,7 +37,7 @@ module.exports = function ( i ) {
     }
 
     if ( vinyl.isStream() ) {
-      put( uri, vinyl, function ( res ) {
+      _put( uri, vinyl, function ( res ) {
         report( res )
         callback()
       } )
@@ -50,7 +50,7 @@ module.exports = function ( i ) {
   } )
 }
 
-function mkdir( uri, callback ) {
+function _mkdir( uri, callback ) {
   var options, req
   options = url.parse( uri )
   options.method = 'MKCOL'
@@ -63,7 +63,7 @@ function mkdir( uri, callback ) {
   req.end()
 }
 
-function put( uri, vinyl, callback ) {
+function _put( uri, vinyl, callback ) {
   var options, req
   options = url.parse( uri )
   options.method = 'PUT'

@@ -40,7 +40,33 @@ describe( PLUGIN_NAME, function () {
     }
   } )
 
-  describe( '#mkdir', function () {
+  describe( '#main', function () {
+    it( 'Should throw exception with "dav:" scheme'
+      , function ( done ) {
+          var expected_path = path.join( node, MOCK )
+          var mock = new Vinyl( { path: MOCK, contents: new Buffer( MOCK ) } )
+          var uri = url.parse( HREF )
+          uri.protocol = 'dav:'
+          assert.throws(
+              function () {
+                unit( uri.format() ).write( mock, null, validate )
+              }
+            , /not supported/
+          )
+          validate()
+          function validate() {
+            assert.equal(
+                fs.existsSync( expected_path )
+              , false
+              , 'file does not exist'
+            )
+            done()
+          }
+        }
+    )
+  } )
+
+  describe( '#_put', function () {
     it( 'Should create a file on the server when vinyl.isBuffer()'
       , function ( done ) {
           var expected_path = path.join( node, MOCK )
@@ -55,7 +81,7 @@ describe( PLUGIN_NAME, function () {
     )
   } )
 
-  describe( '#mkdir', function () {
+  describe( '#_mkdir', function () {
     it( 'Should create a directory on the server when vinyl.isNull()'
       , function ( done ) {
           var expected_path = path.join( node, MOCK )
@@ -70,7 +96,7 @@ describe( PLUGIN_NAME, function () {
     )
   } )
 
-  describe( '#mkdir', function () {
+  describe( '#_put', function () {
     it( 'Should create a file on the server when vinyl.isStream()'
       , function ( done ) {
           var expected_path = path.join( node, MOCK )
