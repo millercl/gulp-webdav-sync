@@ -3,7 +3,7 @@ var dav = require( './index.js' )
 var gulp = require( 'gulp' )
 var jscs = require( 'gulp-jscs' )
 var jshint = require( 'gulp-jshint' )
-var npm = require( 'npm' )
+var npmconf = require( 'npmconf' )
 var runSequence = require( 'run-sequence' )
 var stylish = require( 'jshint-stylish' )
 
@@ -15,23 +15,26 @@ gulp.task( 'int-test', function ( callback ) {
 } )
 
 gulp.task( 'npm.load', function ( callback ) {
-  if ( !npm.config.loaded ) {
-    npm.load( null, function () {
+  if ( !npmconf.loaded ) {
+    npmconf.load( null, function () {
       callback()
     } )
   }
 } )
 
 gulp.task( 'debug', function () {
-  if ( npm.config.sources.user ) {
-    uri = npm.config.sources.user.data.dav
+  if ( npmconf.loaded.sources.global ) {
+    uri = npmconf.loaded.sources.global.data.dav
   }
-  if ( npm.config.sources.project ) {
-    uri = npm.config.sources.project.data.dav
+  if ( npmconf.loaded.sources.user ) {
+    uri = npmconf.loaded.sources.user.data.dav
+  }
+  if ( npmconf.loaded.sources.project ) {
+    uri = npmconf.loaded.sources.project.data.dav
   }
   return gulp.src( 'test/assets/*' )
     .pipe( debug( { title: 'pre' } ) )
-    .pipe( dav( uri ) )
+    .pipe( dav() )
     .pipe( debug( { title: 'post' } ) )
 } )
 
