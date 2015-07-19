@@ -3,10 +3,10 @@ var dav = require( 'jsDAV' )
 var del = require( 'del' )
 var es = require( 'event-stream' )
 var fs = require( 'fs' )
-var npm = require( 'npm' )
+var mod = require( '../index' )
+var npmconf = require( 'npmconf' )
 var os = require( 'os' )
 var path = require( 'path' )
-var unit = require( '../index' )
 var url = require( 'url' )
 var Vinyl = require( 'vinyl' )
 
@@ -17,8 +17,8 @@ const TEMP = 'tmp'
 
 describe( PLUGIN_NAME, function () {
   before( function ( done ) {
-    npm.load( null, function () {
-      node = path.join( npm.config.prefix, TEMP )
+    npmconf.load( null, function () {
+      node = path.join( npmconf.loaded.prefix, TEMP )
       if ( !fs.existsSync( node ) ) {
         fs.mkdirSync( node )
       }
@@ -49,7 +49,7 @@ describe( PLUGIN_NAME, function () {
           uri.protocol = 'dav:'
           assert.throws(
               function () {
-                unit( uri.format() ).write( mock, null, validate )
+                mod( uri.format() ).write( mock, null, validate )
               }
             , /not supported/
           )
@@ -64,17 +64,40 @@ describe( PLUGIN_NAME, function () {
           }
         }
     )
-  } )
 
-  describe( '#_put', function () {
-    it( 'Should create a file on the server when vinyl.isBuffer()'
+    it( 'Should emit an "error" event on refused connection ( closed port )'
       , function ( done ) {
           var expected_path = path.join( node, MOCK )
           var mock = new Vinyl( { path: MOCK, contents: new Buffer( MOCK ) } )
-          assert( mock.isBuffer(), 'vinyl.isBuffer()' )
-          unit( HREF ).write( mock, null, validate )
+          var uri = url.parse( HREF )
+          var mal = {
+            protocol: uri.protocol
+            , slashes: uri.slashes
+            , auth: uri.auth
+            , port: 65536
+            , hostname: uri.hostname
+            , hash: uri.hash
+            , search: uri.search
+            , query: uri.query
+            , pathname: uri.pathname
+            , path: uri.path
+          }
+          var expected= new Error( 'connect ECONNREFUSED' )
+          expected.code = 'ECONNREFUSED'
+          expected.errno = 'ECONNREFUSED'
+          expected.syscall = 'connect'
+          var unit = mod( url.format( mal ) )
+          unit.on( 'error', function ( actual ) {
+            assert.deepEqual( actual, expected, 'error is ECONNREFUSED' )
+            validate()
+          } )
+          unit.write( mock, null, null )
           function validate() {
-            assert( fs.existsSync( expected_path ), 'file exists' )
+            assert.equal(
+                fs.existsSync( expected_path )
+              , false
+              , 'file does not exist'
+            )
             done()
           }
         }
@@ -87,7 +110,8 @@ describe( PLUGIN_NAME, function () {
           var expected_path = path.join( node, MOCK )
           var mock = new Vinyl( { path: MOCK } )
           assert( mock.isNull(), 'vinyl.isNull()' )
-          unit( HREF ).write( mock, null, validate )
+          var unit = mod( HREF )
+          unit.write( mock, null, validate )
           function validate() {
             assert( fs.existsSync( expected_path ), 'directory exists' )
             done()
@@ -97,13 +121,27 @@ describe( PLUGIN_NAME, function () {
   } )
 
   describe( '#_put', function () {
+    it( 'Should create a file on the server when vinyl.isBuffer()'
+      , function ( done ) {
+          var expected_path = path.join( node, MOCK )
+          var mock = new Vinyl( { path: MOCK, contents: new Buffer( MOCK ) } )
+          assert( mock.isBuffer(), 'vinyl.isBuffer()' )
+          var unit = mod( HREF )
+          unit.write( mock, null, validate )
+          function validate() {
+            assert( fs.existsSync( expected_path ), 'file exists' )
+            done()
+          }
+        }
+    )
     it( 'Should create a file on the server when vinyl.isStream()'
       , function ( done ) {
           var expected_path = path.join( node, MOCK )
           var mock = new Vinyl
             ( { path: MOCK , contents: es.readArray( [ MOCK ] ) } )
           assert( mock.isStream(), 'vinyl.isStream()' )
-          unit( HREF ).write( mock, null, validate )
+          var unit = mod( HREF )
+          unit.write( mock, null, validate )
           function validate() {
             assert( fs.existsSync( expected_path ), 'file exists' )
             done()
