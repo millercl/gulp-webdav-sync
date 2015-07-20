@@ -3,11 +3,24 @@ var http = require( 'http' )
 var npmconf = require( 'npmconf' )
 var path = require( 'path' )
 var Stream = require( 'stream' )
+var underscore = require( 'underscore' )
 var url = require( 'url' )
 
 const PLUGIN_NAME = 'gulp-webdav-sync'
 
-module.exports = function ( i ) {
+module.exports = function () {
+  _string = ''
+  _options = {}
+
+  for ( var i in arguments ) {
+    if ( typeof arguments[i] === 'string' ) {
+      _string = arguments[i]
+    }
+    if ( typeof arguments[i] === 'object' && arguments[i] ) {
+      _options = underscore.extend( _options, arguments[i] )
+    }
+  }
+
   stream = new Stream.Transform( { objectMode: true } )
   stream._transform = function ( vinyl, encoding, callback ) {
     if ( !npmconf.loaded ) {
@@ -17,11 +30,7 @@ module.exports = function ( i ) {
     }
 
     function init() {
-      if ( i && typeof i == 'string' ) {
-        uri = i + vinyl.relative
-      } else {
-        uri = target() + vinyl.relative
-      }
+      uri = target( _string )
       if ( vinyl.isBuffer() ) {
         _put( uri, vinyl, resume )
         return
@@ -37,7 +46,10 @@ module.exports = function ( i ) {
       callback( null, vinyl )
     }
 
-    function target() {
+    function target( path ) {
+      if ( path && path.toString() !== '' ) {
+        return path + vinyl.relative
+      }
       var href
       if ( npmconf.loaded.sources.global ) {
         href = npmconf.loaded.sources.global.data.dav
@@ -48,7 +60,7 @@ module.exports = function ( i ) {
       if ( npmconf.loaded.sources.project ) {
         href = npmconf.loaded.sources.project.data.dav
       }
-      return href
+      return href + vinyl.relative
     }
 
     function resume( res ) {
@@ -71,7 +83,7 @@ module.exports = function ( i ) {
 
 function _mkdir( uri, callback ) {
   var options, req
-  options = url.parse( uri )
+  options = underscore.extend( _options, url.parse( uri ) )
   options.method = 'MKCOL'
   req = http.request( options, callback )
   req.on( 'error', _on_error )
@@ -80,7 +92,7 @@ function _mkdir( uri, callback ) {
 
 function _put( uri, vinyl, callback ) {
   var options, req
-  options = url.parse( uri )
+  options = underscore.extend( _options, url.parse( uri ) )
   options.method = 'PUT'
   req = http.request( options, callback )
   vinyl.pipe( req )
