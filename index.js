@@ -81,6 +81,12 @@ module.exports = function () {
   return stream
 }
 
+function _delete( uri, callback ) {
+}
+
+function _get( uri, vinyl, callback ) {
+}
+
 function _mkcol( uri, callback ) {
   var options, req
   options = underscore.extend( _options, url.parse( uri ) )
@@ -90,6 +96,16 @@ function _mkcol( uri, callback ) {
   req.end()
 }
 
+function _on_error( error ) {
+  stream.emit( 'error', error )
+}
+
+function _propfind( uri, callback ) {
+}
+
+function _proppatch( uri, props, callback ) {
+}
+
 function _put( uri, vinyl, callback ) {
   var options, req
   options = underscore.extend( _options, url.parse( uri ) )
@@ -97,8 +113,4 @@ function _put( uri, vinyl, callback ) {
   req = http.request( options, callback )
   vinyl.pipe( req )
   req.on( 'error', _on_error )
-}
-
-function _on_error( error ) {
-  stream.emit( 'error', error )
 }
