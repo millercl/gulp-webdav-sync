@@ -36,7 +36,7 @@ module.exports = function () {
         return
       }
       if ( vinyl.isNull() ) {
-        _mkdir( uri, resume )
+        _mkcol( uri, resume )
         return
       }
       if ( vinyl.isStream() ) {
@@ -81,7 +81,7 @@ module.exports = function () {
   return stream
 }
 
-function _mkdir( uri, callback ) {
+function _mkcol( uri, callback ) {
   var options, req
   options = underscore.extend( _options, url.parse( uri ) )
   options.method = 'MKCOL'
