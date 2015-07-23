@@ -34,7 +34,7 @@ gulp.task( 'debug', function () {
   }
   return gulp.src( 'test/assets/*' )
     .pipe( debug( { title: 'pre' } ) )
-    .pipe( dav() )
+    .pipe( dav( { log: 'info' } ) )
     .pipe( debug( { title: 'post' } ) )
 } )
 

@@ -10,7 +10,9 @@ const PLUGIN_NAME = 'gulp-webdav-sync'
 
 module.exports = function () {
   _string = ''
-  _options = {}
+  _options = {
+    log: 'error'
+  }
 
   for ( var i in arguments ) {
     if ( typeof arguments[i] === 'string' ) {
@@ -71,7 +73,7 @@ module.exports = function () {
     }
 
     function report( res ) {
-      gutil.log(
+      log.info(
         uri
         , res.statusCode
         , http.STATUS_CODES[res.statusCode]
@@ -86,6 +88,19 @@ function _delete( uri, callback ) {
 
 function _get( uri, vinyl, callback ) {
 }
+
+var log = ( function () {
+  var methods = [ 'error', 'warn', 'info', 'log' ]
+  var _log = {}
+  methods.forEach( function ( element, index, array ) {
+    _log[element] = function () {
+      if ( index <= methods.indexOf( _options.log ) ) {
+        console[element].apply( this, arguments )
+      }
+    }
+  } )
+  return _log
+} )()
 
 function _mkcol( uri, callback ) {
   var options, req
