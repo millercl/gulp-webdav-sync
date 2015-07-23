@@ -2,18 +2,18 @@
 > Put files and folders to a WebDAV server. Deploy with [gulp](http://gulpjs.com/).
 
 ## Usage
-Target is loaded from npmrc - global, user, or project file, or may be passed as the first parameter.
+Target is loaded from npmrc - global, user, or project file, or may be passed as a string parameter.
 ```shell
 npm set dav http://user:pass@localhost:8000/
 ```
 
 ```js
 var dav = require( 'gulp-webdav-sync' )
-var options = {
-    log: 'info'
-}
 
 gulp.task( 'default', function () {
+  var options = {
+      log: 'info'
+  }
   return gulp.src( '*' )
     .pipe( dav( options ) )
 } )
@@ -23,8 +23,14 @@ gulp.task( 'default', function () {
 Superset of [http.request options parameter](https://nodejs.org/api/http.html#http_http_request_options_callback).
 
 ### options.log
-`'error'` | `'warn'` | `'info'` | `'log'` 
-Logging threshold. Orthogonal to the `console` methods. `'info'` reports HTTP status codes. Default: `'error'`
+Logging threshold. Orthogonal to the `console` methods.
+
+ string   |   output
+:-------: | --------------
+`'error'` | **Default**
+`'warn'`  |
+`'info'`  | HTTP Responses
+`'log'`   | Debug
 
 ## Development
 ```shell
