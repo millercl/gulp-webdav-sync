@@ -9,12 +9,22 @@ npm set dav http://user:pass@localhost:8000/
 
 ```js
 var dav = require( 'gulp-webdav-sync' )
+var options = {
+    log: 'info'
+}
 
 gulp.task( 'default', function () {
   return gulp.src( '*' )
-    .pipe( dav() )
+    .pipe( dav( options ) )
 } )
 ```
+
+## Options
+Superset of [http.request options parameter](https://nodejs.org/api/http.html#http_http_request_options_callback).
+
+### options.log
+`'error'` | `'warn'` | `'info'` | `'log'` 
+Logging threshold. Orthogonal to the `console` methods. `'info'` reports HTTP status codes. Default: `'error'`
 
 ## Development
 ```shell
