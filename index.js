@@ -1,3 +1,4 @@
+var chalk = require( 'chalk' )
 var gutil = require( 'gulp-util' )
 var http = require( 'http' )
 var npmconf = require( 'npmconf' )
@@ -73,11 +74,62 @@ module.exports = function () {
     }
 
     function report( res ) {
-      log.info(
-        uri
-        , res.statusCode
-        , http.STATUS_CODES[res.statusCode]
-      )
+      function code_fn( statusCode ) {
+        switch ( statusCode ) {
+          case 102:
+            return chalk.bgYellow.white
+          case 200:
+          case 201:
+          case 204:
+            return chalk.bgGreen.white
+          case 207:
+            return chalk.bgWhite.black
+          case 403:
+          case 409:
+          case 412:
+          case 415:
+          case 422:
+          case 423:
+          case 424:
+          case 502:
+          case 507:
+            return chalk.bgRed.white
+          default:
+            return chalk.bgWhite.black
+        }
+      }
+      function msg_fn( statusMessage ) {
+        switch ( statusMessage ) {
+          case 102:
+            return chalk.yellow
+          case 200:
+          case 201:
+          case 204:
+            return chalk.green
+          case 207:
+            return chalk.white
+          case 403:
+          case 409:
+          case 412:
+          case 415:
+          case 422:
+          case 423:
+          case 424:
+          case 502:
+          case 507:
+            return chalk.red
+          default:
+            return chalk.white
+        }
+      }
+      var from = chalk.underline.cyan( vinyl.path )
+      var to = chalk.underline.cyan( uri )
+      var code =
+        code_fn( res.statusCode ).call( this, res.statusCode )
+      var msg =
+        msg_fn( res.statusCode ).call( this, http.STATUS_CODES[res.statusCode] )
+      log.info( from, '->', to )
+      log.info( code, msg )
     }
   }
   return stream
@@ -87,6 +139,10 @@ function _delete( uri, callback ) {
 }
 
 function _get( uri, vinyl, callback ) {
+}
+
+function _gulp_prefix() {
+  return '[' + chalk.grey( ( new Date() ).toLocaleTimeString() ) + ']'
 }
 
 var log = ( function () {
