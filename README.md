@@ -12,9 +12,10 @@ var dav = require( 'gulp-webdav-sync' )
 
 gulp.task( 'default', function () {
   var options = {
-      log: 'info'
+      'log': 'info'
+    , 'parent': 'dist'
   }
-  return gulp.src( '*' )
+  return gulp.src( 'dist/**' )
     .pipe( dav( options ) )
 } )
 ```
@@ -27,10 +28,17 @@ Logging threshold. Orthogonal to the `console` methods.
 
  string   |   output
 :-------: | --------------
-`'error'` | **Default**
+`'error'` |
 `'warn'`  |
 `'info'`  | HTTP Responses
 `'log'`   | Debug
+
+**Default:** `'error'`
+
+### options.parent
+Relative or absolute path which halves the source path [`vinyl.path`] for appending the subsequent to the DAV target URI. Use with glob `**` to prevent super-directories from being created on the target. e.g. `gulp.src( 'dist/**' )`.
+
+**Default:** `process.cwd()`
 
 ## Development
 ```shell

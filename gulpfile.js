@@ -23,18 +23,9 @@ gulp.task( 'npm.load', function ( callback ) {
 } )
 
 gulp.task( 'debug', function () {
-  if ( npmconf.loaded.sources.global ) {
-    uri = npmconf.loaded.sources.global.data.dav
-  }
-  if ( npmconf.loaded.sources.user ) {
-    uri = npmconf.loaded.sources.user.data.dav
-  }
-  if ( npmconf.loaded.sources.project ) {
-    uri = npmconf.loaded.sources.project.data.dav
-  }
-  return gulp.src( 'test/assets/*' )
+  return gulp.src( 'test/assets/**' )
     .pipe( debug( { title: 'pre' } ) )
-    .pipe( dav( { log: 'info' } ) )
+    .pipe( dav( { 'log': 'info', 'parent': 'test/assets' } ) )
     .pipe( debug( { title: 'post' } ) )
 } )
 

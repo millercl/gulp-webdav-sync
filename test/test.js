@@ -44,7 +44,10 @@ describe( PLUGIN_NAME, function () {
     it( 'Should throw exception with "dav:" scheme'
       , function ( done ) {
           var expected_path = path.join( node, MOCK )
-          var mock = new Vinyl( { path: MOCK, contents: new Buffer( MOCK ) } )
+          var mock = new Vinyl( {
+            path: path.resolve( MOCK )
+            , contents: new Buffer( MOCK )
+          } )
           var uri = url.parse( HREF )
           uri.protocol = 'dav:'
           assert.throws(
@@ -68,7 +71,10 @@ describe( PLUGIN_NAME, function () {
     it( 'Should emit an "error" event on refused connection ( closed port )'
       , function ( done ) {
           var expected_path = path.join( node, MOCK )
-          var mock = new Vinyl( { path: MOCK, contents: new Buffer( MOCK ) } )
+          var mock = new Vinyl( {
+            path: path.resolve( MOCK )
+            , contents: new Buffer( MOCK )
+          } )
           var uri = url.parse( HREF )
           var mal = {
             protocol: uri.protocol
@@ -108,7 +114,9 @@ describe( PLUGIN_NAME, function () {
     it( 'Should create a directory on the server when vinyl.isNull()'
       , function ( done ) {
           var expected_path = path.join( node, MOCK )
-          var mock = new Vinyl( { path: MOCK } )
+          var mock = new Vinyl( {
+            path: path.resolve( MOCK )
+          } )
           assert( mock.isNull(), 'vinyl.isNull()' )
           var unit = mod( HREF )
           unit.write( mock, null, validate )
@@ -124,7 +132,10 @@ describe( PLUGIN_NAME, function () {
     it( 'Should create a file on the server when vinyl.isBuffer()'
       , function ( done ) {
           var expected_path = path.join( node, MOCK )
-          var mock = new Vinyl( { path: MOCK, contents: new Buffer( MOCK ) } )
+          var mock = new Vinyl( {
+            path: path.resolve( MOCK )
+            , contents: new Buffer( MOCK )
+          } )
           assert( mock.isBuffer(), 'vinyl.isBuffer()' )
           var unit = mod( HREF )
           unit.write( mock, null, validate )
@@ -137,8 +148,10 @@ describe( PLUGIN_NAME, function () {
     it( 'Should create a file on the server when vinyl.isStream()'
       , function ( done ) {
           var expected_path = path.join( node, MOCK )
-          var mock = new Vinyl
-            ( { path: MOCK , contents: es.readArray( [ MOCK ] ) } )
+          var mock = new Vinyl( {
+            path: path.resolve( MOCK )
+            , contents: es.readArray( [ MOCK ] )
+          } )
           assert( mock.isStream(), 'vinyl.isStream()' )
           var unit = mod( HREF )
           unit.write( mock, null, validate )

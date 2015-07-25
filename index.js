@@ -12,7 +12,8 @@ const PLUGIN_NAME = 'gulp-webdav-sync'
 module.exports = function () {
   _string = ''
   _options = {
-    log: 'error'
+    'log': 'error'
+    , 'parent': process.cwd()
   }
 
   for ( var i in arguments ) {
@@ -33,7 +34,7 @@ module.exports = function () {
     }
 
     function init() {
-      uri = target( _string )
+      uri = target( _string, vinyl )
       if ( vinyl.isBuffer() ) {
         _put( uri, vinyl, resume )
         return
@@ -49,11 +50,36 @@ module.exports = function () {
       callback( null, vinyl )
     }
 
-    function target( path ) {
-      if ( path && path.toString() !== '' ) {
-        return path + vinyl.relative
+    function target( href, vinyl ) {
+      var vinyl_stem = ''
+      var opt = path.resolve( _options.parent )
+      log.log( _gulp_prefix( 'main#target$opt' ), opt )
+      if ( vinyl.path.length < opt.length ) {
+        _on_error(
+          new gutil.PluginError(
+              PLUGIN_NAME
+            , 'Incoherent Target: options.parent too long.\n'
+            + '\tvinyl.path is ' + vinyl.path + '\n'
+            + '\toptions.parent is ' + opt + '\n'
+          )
+        )
       }
-      var href
+      if ( vinyl.path.substr( 0, opt.length ) === opt ) {
+        vinyl_stem = vinyl.path.substr( opt.length+1 )
+      } else {
+        _on_error(
+          new gutil.PluginError(
+              PLUGIN_NAME
+            , 'Incoherent Target: paths diverge.\n'
+            + '\tvinyl.path is ' + vinyl.path + '\n'
+            + '\toptions.parent is ' + opt + '\n'
+          )
+        )
+      }
+      log.log( _gulp_prefix( 'main#target$vinyl_stem' ), vinyl_stem )
+      if ( href && path.toString() !== '' ) {
+        return href + vinyl_stem
+      }
       if ( npmconf.loaded.sources.global ) {
         href = npmconf.loaded.sources.global.data.dav
       }
@@ -63,7 +89,7 @@ module.exports = function () {
       if ( npmconf.loaded.sources.project ) {
         href = npmconf.loaded.sources.project.data.dav
       }
-      return href + vinyl.relative
+      return href + vinyl_stem
     }
 
     function resume( res ) {
@@ -128,7 +154,8 @@ module.exports = function () {
         code_fn( res.statusCode ).call( this, res.statusCode )
       var msg =
         msg_fn( res.statusCode ).call( this, http.STATUS_CODES[res.statusCode] )
-      log.info( from, '->', to )
+      log.info( from )
+      log.info( '-->', to )
       log.info( code, msg )
     }
   }
@@ -142,7 +169,10 @@ function _get( uri, vinyl, callback ) {
 }
 
 function _gulp_prefix() {
-  return '[' + chalk.grey( ( new Date() ).toLocaleTimeString() ) + ']'
+  var time = '[' + chalk.grey( ( new Date() ).toLocaleTimeString() ) + ']'
+  var name = '[' + chalk.grey( PLUGIN_NAME ) + ']'
+  var item = chalk.grey( arguments[0] )
+  return [ time, name, item ].join( ' ' )
 }
 
 var log = ( function () {
@@ -160,8 +190,11 @@ var log = ( function () {
 
 function _mkcol( uri, callback ) {
   var options, req
-  options = underscore.extend( _options, url.parse( uri ) )
-  options.method = 'MKCOL'
+  options = underscore.extend(
+      _options
+    , url.parse( uri )
+    , { method: 'MKCOL' }
+  )
   req = http.request( options, callback )
   req.on( 'error', _on_error )
   req.end()
@@ -179,8 +212,11 @@ function _proppatch( uri, props, callback ) {
 
 function _put( uri, vinyl, callback ) {
   var options, req
-  options = underscore.extend( _options, url.parse( uri ) )
-  options.method = 'PUT'
+  options = underscore.extend(
+      _options
+    , url.parse( uri )
+    , { method: 'PUT' }
+  )
   req = http.request( options, callback )
   vinyl.pipe( req )
   req.on( 'error', _on_error )
