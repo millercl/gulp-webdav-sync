@@ -35,6 +35,11 @@ Logging threshold. Orthogonal to the `console` methods.
 
 **Default:** `'error'`
 
+### options.logAuth
+Boolean. Display credentials in logged URLs.
+
+**Default:** `false`
+
 ### options.parent
 Relative or absolute path which halves the source path [`vinyl.path`] for appending the subsequent to the DAV target URI. Use with glob `**` to prevent super-directories from being created on the target. e.g. `gulp.src( 'dist/**' )`.
 

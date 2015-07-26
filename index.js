@@ -13,6 +13,7 @@ module.exports = function () {
   _string = ''
   _options = {
     'log': 'error'
+    , 'logAuth': false
     , 'parent': process.cwd()
   }
 
@@ -148,15 +149,47 @@ module.exports = function () {
             return chalk.white
         }
       }
+      function align_right() {
+        var max = underscore.chain( arguments )
+          .map( function ( x ) {
+            return x.length
+          } )
+          .max()
+          .value()
+        return underscore.map(
+            arguments
+          , function ( x ) {
+              var diff = max - x.length
+              var pref = []
+              underscore.times(
+                  diff
+                , function () {
+                    pref.push( ' ' )
+                  }
+              )
+              pref.push( x )
+              return pref.join( '' )
+            }
+        )
+      }
+      function logAuth( uri ) {
+        if ( _options.logAuth ) {
+          return uri
+        }
+        var strip = url.parse( uri )
+        strip.auth = null
+        return strip.format()
+      }
       var from = chalk.underline.cyan( vinyl.path )
-      var to = chalk.underline.cyan( uri )
+      var to = chalk.underline.cyan( logAuth( uri ) )
       var code =
         code_fn( res.statusCode ).call( this, res.statusCode )
       var msg =
         msg_fn( res.statusCode ).call( this, http.STATUS_CODES[res.statusCode] )
-      log.info( from )
-      log.info( '-->', to )
-      log.info( code, msg )
+      log.info( '  ', align_right( to, from )[1] )
+      log.info( '  ', align_right( to, from )[0] )
+      log.info( '  ', code, msg )
+      log.info()
     }
   }
   return stream
