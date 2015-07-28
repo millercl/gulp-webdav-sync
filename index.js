@@ -35,7 +35,14 @@ module.exports = function () {
     }
 
     function init() {
-      uri = target( _string, vinyl )
+      try {
+        uri = target( _string, vinyl )
+      } catch ( error ) {
+        _on_error( error )
+        callback( null, vinyl )
+        return
+      }
+      log.log( _gulp_prefix( 'main#init$uri' ), uri )
       if ( vinyl.isBuffer() ) {
         _put( uri, vinyl, resume )
         return
@@ -56,26 +63,28 @@ module.exports = function () {
       var opt = path.resolve( _options.parent )
       log.log( _gulp_prefix( 'main#target$opt' ), opt )
       if ( vinyl.path.length < opt.length ) {
-        _on_error(
-          new gutil.PluginError(
-              PLUGIN_NAME
-            , 'Incoherent Target: options.parent too long.\n'
-            + '\tvinyl.path is ' + vinyl.path + '\n'
-            + '\toptions.parent is ' + opt + '\n'
-          )
+        var error = new gutil.PluginError(
+            PLUGIN_NAME
+          , 'Incoherent Target: options.parent too long.\n'
+          + '\tvinyl.path is ' + chalk.red( vinyl.path ) + '\n'
+          + '\toptions.parent is ' + chalk.red( opt ) + '\n'
         )
+        error.vinyl_path = vinyl.path
+        error.parent = opt
+        throw error
       }
       if ( vinyl.path.substr( 0, opt.length ) === opt ) {
         vinyl_stem = vinyl.path.substr( opt.length+1 )
       } else {
-        _on_error(
-          new gutil.PluginError(
-              PLUGIN_NAME
-            , 'Incoherent Target: paths diverge.\n'
-            + '\tvinyl.path is ' + vinyl.path + '\n'
-            + '\toptions.parent is ' + opt + '\n'
-          )
+        var error = new gutil.PluginError(
+            PLUGIN_NAME
+          , 'Incoherent Target: paths diverge.\n'
+          + '\tvinyl.path is ' + chalk.red( vinyl.path ) + '\n'
+          + '\toptions.parent is ' + chalk.red( opt ) + '\n'
         )
+        error.vinyl = vinyl.path
+        error.parent = opt
+        throw error
       }
       log.log( _gulp_prefix( 'main#target$vinyl_stem' ), vinyl_stem )
       if ( href && path.toString() !== '' ) {

@@ -108,6 +108,62 @@ describe( PLUGIN_NAME, function () {
           }
         }
     )
+
+    it( 'Should emit an "error" event when "parent" and file paths diverge'
+      , function ( done ) {
+          var expected_path = path.join( node, MOCK )
+          var mock = new Vinyl( {
+            path: path.resolve( MOCK )
+            , contents: new Buffer( MOCK )
+          } )
+          var options = {
+            'parent': os.tmpDir()
+          }
+          var unit = mod( options, HREF )
+          unit.on( 'error', function ( actual ) {
+            assert( /paths diverge/.test( actual ), 'error is "paths diverge"' )
+            validate()
+          } )
+          unit.write( mock, null, null )
+          function validate() {
+            assert.equal(
+                fs.existsSync( expected_path )
+              , false
+              , 'file does not exist'
+            )
+            done()
+          }
+        }
+    )
+
+    it( 'Should emit an "error" event when "parent" is longer than file path'
+      , function ( done ) {
+          var expected_path = path.join( node, MOCK )
+          var mock = new Vinyl( {
+            path: path.resolve( MOCK )
+            , contents: new Buffer( MOCK )
+          } )
+          var options = {
+            'parent': path.join( process.cwd()
+            , MOCK, '/', MOCK )
+          }
+          var unit = mod( options, HREF )
+          unit.on( 'error', function ( actual ) {
+            assert( /too long/.test( actual ), 'error is "too long"' )
+            validate()
+          } )
+          unit.write( mock, null, null )
+          function validate() {
+            assert.equal(
+                fs.existsSync( expected_path )
+              , false
+              , 'file does not exist'
+            )
+            done()
+          }
+        }
+    )
+
   } )
 
   describe( '#_mkdir', function () {
