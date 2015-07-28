@@ -6,6 +6,7 @@ var path = require( 'path' )
 var Stream = require( 'stream' )
 var underscore = require( 'underscore' )
 var url = require( 'url' )
+var xml2js = require( 'xml2js' )
 
 const PLUGIN_NAME = 'gulp-webdav-sync'
 
@@ -35,179 +36,163 @@ module.exports = function () {
     }
 
     function init() {
+      const FN_NAME = 'main#init'
       try {
-        uri = target( _string, vinyl )
+        target_uri = _splice_target(
+            vinyl.path
+          , path.resolve( _options.parent )
+          , _string
+        )
       } catch ( error ) {
         _on_error( error )
         callback( null, vinyl )
         return
       }
-      log.log( _gulp_prefix( 'main#init$uri' ), uri )
+      log.log( _gulp_prefix( FN_NAME + '$target_uri' ), target_uri )
+      info_target( vinyl, target_uri )
       if ( vinyl.isBuffer() ) {
-        _put( uri, vinyl, resume )
+        _put( target_uri, vinyl, resume )
         return
       }
       if ( vinyl.isNull() ) {
-        _mkcol( uri, resume )
+        _mkcol( target_uri, resume )
         return
       }
       if ( vinyl.isStream() ) {
-        _put( uri, vinyl, resume )
+        _put( target_uri, vinyl, resume )
         return
       }
       callback( null, vinyl )
     }
 
-    function target( href, vinyl ) {
-      var vinyl_stem = ''
-      var opt = path.resolve( _options.parent )
-      log.log( _gulp_prefix( 'main#target$opt' ), opt )
-      if ( vinyl.path.length < opt.length ) {
-        var error = new gutil.PluginError(
-            PLUGIN_NAME
-          , 'Incoherent Target: options.parent too long.\n'
-          + '\tvinyl.path is ' + chalk.red( vinyl.path ) + '\n'
-          + '\toptions.parent is ' + chalk.red( opt ) + '\n'
-        )
-        error.vinyl_path = vinyl.path
-        error.parent = opt
-        throw error
+    function info_target( vinyl, uri ) {
+      if ( _options.logAuth ) {
+        uri = _strip_url_auth( uri )
       }
-      if ( vinyl.path.substr( 0, opt.length ) === opt ) {
-        vinyl_stem = vinyl.path.substr( opt.length+1 )
-      } else {
-        var error = new gutil.PluginError(
-            PLUGIN_NAME
-          , 'Incoherent Target: paths diverge.\n'
-          + '\tvinyl.path is ' + chalk.red( vinyl.path ) + '\n'
-          + '\toptions.parent is ' + chalk.red( opt ) + '\n'
-        )
-        error.vinyl = vinyl.path
-        error.parent = opt
-        throw error
-      }
-      log.log( _gulp_prefix( 'main#target$vinyl_stem' ), vinyl_stem )
-      if ( href && path.toString() !== '' ) {
-        return href + vinyl_stem
-      }
-      if ( npmconf.loaded.sources.global ) {
-        href = npmconf.loaded.sources.global.data.dav
-      }
-      if ( npmconf.loaded.sources.user ) {
-        href = npmconf.loaded.sources.user.data.dav
-      }
-      if ( npmconf.loaded.sources.project ) {
-        href = npmconf.loaded.sources.project.data.dav
-      }
-      return href + vinyl_stem
+      var from = chalk.underline.cyan( vinyl.path )
+      var to = chalk.underline.cyan( uri )
+      log.info( '  ', _align_right( to, from )[1] )
+      log.info( '  ', _align_right( to, from )[0] )
     }
 
     function resume( res ) {
       if ( res ) {
-        report( res )
+        info_status( res )
       }
       callback()
     }
 
-    function report( res ) {
-      function code_fn( statusCode ) {
-        switch ( statusCode ) {
-          case 102:
-            return chalk.bgYellow.white
-          case 200:
-          case 201:
-          case 204:
-            return chalk.bgGreen.white
-          case 207:
-            return chalk.bgWhite.black
-          case 403:
-          case 409:
-          case 412:
-          case 415:
-          case 422:
-          case 423:
-          case 424:
-          case 502:
-          case 507:
-            return chalk.bgRed.white
-          default:
-            return chalk.bgWhite.black
-        }
-      }
-      function msg_fn( statusMessage ) {
-        switch ( statusMessage ) {
-          case 102:
-            return chalk.yellow
-          case 200:
-          case 201:
-          case 204:
-            return chalk.green
-          case 207:
-            return chalk.white
-          case 403:
-          case 409:
-          case 412:
-          case 415:
-          case 422:
-          case 423:
-          case 424:
-          case 502:
-          case 507:
-            return chalk.red
-          default:
-            return chalk.white
-        }
-      }
-      function align_right() {
-        var max = underscore.chain( arguments )
-          .map( function ( x ) {
-            return x.length
-          } )
-          .max()
-          .value()
-        return underscore.map(
-            arguments
-          , function ( x ) {
-              var diff = max - x.length
-              var pref = []
-              underscore.times(
-                  diff
-                , function () {
-                    pref.push( ' ' )
-                  }
-              )
-              pref.push( x )
-              return pref.join( '' )
-            }
-        )
-      }
-      function logAuth( uri ) {
-        if ( _options.logAuth ) {
-          return uri
-        }
-        var strip = url.parse( uri )
-        strip.auth = null
-        return strip.format()
-      }
-      var from = chalk.underline.cyan( vinyl.path )
-      var to = chalk.underline.cyan( logAuth( uri ) )
+    function info_status( res ) {
       var code =
-        code_fn( res.statusCode ).call( this, res.statusCode )
+        _colorcode_statusCode_fn( res.statusCode )
+          .call( this, res.statusCode )
       var msg =
-        msg_fn( res.statusCode ).call( this, http.STATUS_CODES[res.statusCode] )
-      log.info( '  ', align_right( to, from )[1] )
-      log.info( '  ', align_right( to, from )[0] )
+        _colorcode_statusMessage_fn( res.statusCode )
+          .call( this, http.STATUS_CODES[res.statusCode] )
       log.info( '  ', code, msg )
-      log.info()
     }
   }
   return stream
+}
+
+function _align_right() {
+  var max = underscore.chain( arguments )
+    .map( function ( x ) {
+      return x.length
+    } )
+    .max()
+    .value()
+  return underscore.map(
+      arguments
+    , function ( x ) {
+        var diff = max - x.length
+        var pref = []
+        underscore.times(
+            diff
+          , function () {
+              pref.push( ' ' )
+            }
+        )
+        pref.push( x )
+        return pref.join( '' )
+      }
+  )
+}
+
+function _colorcode_statusCode_fn( statusCode ) {
+  switch ( statusCode ) {
+    case 102:
+      return chalk.bgYellow.white
+    case 200:
+    case 201:
+    case 204:
+      return chalk.bgGreen.white
+    case 207:
+      return chalk.bgWhite.black
+    case 403:
+    case 409:
+    case 412:
+    case 415:
+    case 422:
+    case 423:
+    case 424:
+    case 502:
+    case 507:
+      return chalk.bgRed.white
+    default:
+      return chalk.bgWhite.black
+  }
+}
+
+function _colorcode_statusMessage_fn( statusMessage ) {
+  switch ( statusMessage ) {
+    case 102:
+      return chalk.yellow
+    case 200:
+    case 201:
+    case 204:
+      return chalk.green
+    case 207:
+      return chalk.white
+    case 403:
+    case 409:
+    case 412:
+    case 415:
+    case 422:
+    case 423:
+    case 424:
+    case 502:
+    case 507:
+      return chalk.red
+    default:
+      return chalk.white
+  }
 }
 
 function _delete( uri, callback ) {
 }
 
 function _get( uri, vinyl, callback ) {
+}
+
+function _get_npmrc_target() {
+  var href
+  if ( !npmconf.loaded ) {
+    throw new gutil.PluginError(
+        PLUGIN_NAME
+      , 'npmconf.loaded is false'
+    )
+  }
+  if ( npmconf.loaded.sources.global ) {
+    href = npmconf.loaded.sources.global.data.dav
+  }
+  if ( npmconf.loaded.sources.user ) {
+    href = npmconf.loaded.sources.user.data.dav
+  }
+  if ( npmconf.loaded.sources.project ) {
+    href = npmconf.loaded.sources.project.data.dav
+  }
+  return href
 }
 
 function _gulp_prefix() {
@@ -262,4 +247,49 @@ function _put( uri, vinyl, callback ) {
   req = http.request( options, callback )
   vinyl.pipe( req )
   req.on( 'error', _on_error )
+}
+
+function _splice_target( vinyl_path, parent_dir, href ) {
+  const FN_NAME = '#_splice_target'
+  var error
+  var target_stem = ''
+  log.log( _gulp_prefix( FN_NAME + '$vinyl_path' ), vinyl_path )
+  log.log( _gulp_prefix( FN_NAME + '$parent_dir' ), parent_dir )
+  if ( vinyl_path.length < parent_dir.length ) {
+    error = new gutil.PluginError(
+        PLUGIN_NAME
+      , 'Incoherent Target: options.parent too long.\n'
+      + '\tpath is ' + chalk.red( vinyl_path ) + '\n'
+      + '\tparent is ' + chalk.red( parent_dir ) + '\n'
+    )
+    error.vinyl_path = vinyl_path
+    error.parent = parent_dir
+    throw error
+  }
+  if ( vinyl_path.substr( 0, parent_dir.length ) === parent_dir ) {
+    target_stem = vinyl_path.substr( parent_dir.length+1 )
+  } else {
+    error = new gutil.PluginError(
+        PLUGIN_NAME
+      , 'Incoherent Target: paths diverge.\n'
+      + '\tpath is ' + chalk.red( vinyl_path ) + '\n'
+      + '\tparent is ' + chalk.red( parent_dir ) + '\n'
+    )
+    error.vinyl_path = vinyl_path
+    error.parent = parent_dir
+    throw error
+  }
+  log.log( _gulp_prefix( FN_NAME + '$target_stem' ), target_stem )
+  if ( href && path.toString() !== '' ) {
+    return href + target_stem
+  } else {
+    href = _get_npmrc_target()
+  }
+  return href + target_stem
+}
+
+function _strip_url_auth( href ) {
+  var strip = url.parse( href )
+  strip.auth = null
+  return strip.format()
 }
