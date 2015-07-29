@@ -1,0 +1,100 @@
+{
+  "disallowCommaBeforeLineBreak": true
+  , "disallowEmptyBlocks": true
+  , "disallowImplicitTypeConversion": [
+        "binary"
+      , "string"
+  ]
+  , "disallowMixedSpacesAndTabs": true
+  , "disallowMultipleLineBreaks": true
+  , "disallowMultipleLineStrings": true
+  , "disallowMultipleVarDecl": "exceptUndefined"
+  , "disallowNewlineBeforeBlockStatements": true
+  , "disallowOperatorBeforeLineBreak": [
+        "+"
+      , "."
+  ]
+  , "disallowSemicolons": true
+  , "disallowSpaceAfterPrefixUnaryOperators": [
+        "++"
+      , "--"
+      , "+"
+      , "-"
+      , "~"
+      , "!"
+  ]
+  , "disallowSpaceBeforePostfixUnaryOperators": [
+        "++"
+      , "--"
+  ]
+  , "disallowSpacesInCallExpression": true
+  , "disallowSpacesInNamedFunctionExpression": {
+    "beforeOpeningRoundBrace": true
+    , "beforeOpeningCurlyBrace": true
+  }
+  , "disallowTrailingWhitespace": true
+  , "maximumLineLength": 80
+  , "requireBlocksOnNewline": true
+  , "requireCapitalizedConstructors": true
+  , "requireCurlyBraces": [
+        "if"
+      , "else"
+      , "for"
+      , "while"
+      , "do"
+      , "try"
+      , "catch"
+  ]
+  , "requireKeywordsOnNewLine": [
+        "if"
+      , "for"
+      , "while"
+  ]
+  , "requireParenthesesAroundIIFE": true
+  , "requireSpaceAfterKeywords": [
+        "do"
+      , "for"
+      , "if"
+      , "switch"
+      , "case"
+      , "try"
+      , "catch"
+      , "while"
+      , "with"
+      , "typeof"
+      , "function"
+  ]
+  , "requireSpaceBeforeBinaryOperators": [
+        "=="
+      , "==="
+      , "!="
+      , "!=="
+  ]
+  , "requireSpaceBeforeBlockStatements": true
+  , "requireSpaceBeforeKeywords": true
+  , "requireSpaceBetweenArguments": true
+  , "requireSpacesInAnonymousFunctionExpression": {
+    "beforeOpeningRoundBrace": true
+    , "beforeOpeningCurlyBrace": true
+  }
+  , "requireSpacesInConditionalExpression": true
+  , "requireSpacesInForStatement": true
+  , "requireSpacesInFunctionDeclaration": {
+    "beforeOpeningCurlyBrace": true
+  }
+  , "requireSpacesInFunctionExpression": {
+    "beforeOpeningCurlyBrace": true
+  }
+  , "requireSpacesInFunction": {
+    "beforeOpeningCurlyBrace": true
+  }
+  , "requireSpacesInNamedFunctionExpression": {
+    "beforeOpeningCurlyBrace": true
+  }
+  , "requireSpacesInsideObjectBrackets": "all"
+  , "requireSpacesInsideParentheses": "all"
+  , "validateIndentation": 2
+  , "validateLineBreaks": "LF"
+  , "validateParameterSeparator": ", "
+  , "validateQuoteMarks": "'"
+}
