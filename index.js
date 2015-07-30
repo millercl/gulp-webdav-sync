@@ -66,7 +66,7 @@ module.exports = function () {
     }
 
     function info_target( vinyl, uri ) {
-      if ( _options.logAuth ) {
+      if ( _options.logAuth !== true ) {
         uri = _strip_url_auth( uri )
       }
       var from = chalk.underline.cyan( vinyl.path )
