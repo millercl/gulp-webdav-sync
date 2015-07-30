@@ -9,15 +9,16 @@ var url = require( 'url' )
 var xml2js = require( 'xml2js' )
 
 const PLUGIN_NAME = 'gulp-webdav-sync'
+var stream
+var _options
 
 module.exports = function () {
-  _string = ''
+  var _string = ''
   _options = {
     'log': 'error'
     , 'logAuth': false
     , 'parent': process.cwd()
   }
-
   for ( var i in arguments ) {
     if ( typeof arguments[i] === 'string' ) {
       _string = arguments[i]
@@ -37,6 +38,7 @@ module.exports = function () {
 
     function init() {
       const FN_NAME = 'main#init'
+      var target_uri
       try {
         target_uri = _splice_target(
             vinyl.path
