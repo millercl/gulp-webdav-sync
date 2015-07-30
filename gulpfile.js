@@ -3,26 +3,12 @@ var dav = require( './index.js' )
 var gulp = require( 'gulp' )
 var jscs = require( 'gulp-jscs' )
 var jshint = require( 'gulp-jshint' )
-var npmconf = require( 'npmconf' )
-var runSequence = require( 'run-sequence' )
 var stylish = require( 'jshint-stylish' )
 
 gulp.task( 'default', [ 'int-test' ] )
 gulp.task( 'src-test', [ 'jshint', 'jscs' ] )
 
-gulp.task( 'int-test', function ( callback ) {
-  runSequence( 'npm.load', 'debug', callback )
-} )
-
-gulp.task( 'npm.load', function ( callback ) {
-  if ( !npmconf.loaded ) {
-    npmconf.load( null, function () {
-      callback()
-    } )
-  }
-} )
-
-gulp.task( 'debug', function () {
+gulp.task( 'int-test', function () {
   return gulp.src( 'test/assets/**' )
     .pipe( debug( { title: 'pre' } ) )
     .pipe( dav( { 'log': 'info', 'parent': 'test/assets' } ) )
@@ -49,7 +35,6 @@ gulp.task( 'jshint', function () {
 } )
 
 gulp.task( 'jscs', function () {
-  // http://jscs.info/rules.html
   return gulp.src( [ '*.js', 'test/*.js' ] )
     .pipe( jscs() )
 } )
