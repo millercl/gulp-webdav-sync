@@ -16,6 +16,7 @@ const MOCK = 'mock'
 const TEMP = 'tmp'
 
 describe( PLUGIN_NAME, function () {
+  var node
   before( function ( done ) {
     npmconf.load( null, function () {
       node = path.join( npmconf.loaded.prefix, TEMP )
