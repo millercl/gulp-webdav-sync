@@ -2,9 +2,13 @@
 > Put files and folders to a WebDAV server. Deploy with [gulp](http://gulpjs.com/).
 
 ## Usage
-Target is loaded from npmrc - global, user, or project file, or may be passed as a string parameter.
+Target is a URL where files are uploaded to. It must specify a directory ( also known as a "collection" ). At a minimum this must be DAV root, but subdirectories may be included ( e.g. project name ). There are three ways to load the target: 1) a npmrc, 2) properties on an object argument, or 3) a string argument. The most local [npmrc](https://docs.npmjs.com/files/npmrc) is preferred, i.e. project > user > global. The user config can be set with npm.
 ```shell
 npm set dav http://user:pass@localhost:8000/
+```
+If credentials are required, then they should be included inline as demonstrated. Alternatively, create a project npmrc when deploying multiple projects to the same server.
+```shell
+echo dav = http://user:pass@localhost:8000/application/ > .npmrc
 ```
 
 ```js
