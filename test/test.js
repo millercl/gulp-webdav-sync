@@ -23,6 +23,7 @@ describe( PLUGIN_NAME, function () {
       if ( !fs.existsSync( node ) ) {
         fs.mkdirSync( node )
       }
+      del.sync( path.join( node, '*' ) )
       var uri = url.parse( HREF )
       var opt = { node: node }
       var srv = dav.mount( opt )
@@ -32,13 +33,10 @@ describe( PLUGIN_NAME, function () {
     } )
   } )
   afterEach( function () {
-    del( path.join( node, '*' ) )
+    del.sync( path.join( node, '*' ) )
   } )
   after( function () {
-    del( path.join( node, '**' ) )
-    if ( fs.existsSync( node ) ) {
-      fs.rmdirSync( node )
-    }
+    del.sync( node )
   } )
 
   describe( '#main', function () {
