@@ -51,7 +51,7 @@ module.exports = function () {
         return
       }
       log.log( _gulp_prefix( FN_NAME + '$target_uri' ), target_uri )
-      info_target( vinyl, target_uri )
+      _info_target( vinyl, target_uri )
       if ( vinyl.isBuffer() ) {
         _put( target_uri, vinyl, resume )
         return
@@ -67,32 +67,13 @@ module.exports = function () {
       callback( null, vinyl )
     }
 
-    function info_target( vinyl, uri ) {
-      if ( _options.logAuth !== true ) {
-        uri = _strip_url_auth( uri )
-      }
-      var from = chalk.underline.cyan( vinyl.path )
-      var to = chalk.underline.cyan( uri )
-      log.info( '  ', _align_right( to, from )[1] )
-      log.info( '  ', _align_right( to, from )[0] )
-    }
-
     function resume( res ) {
       if ( res ) {
-        info_status( res )
+        _info_status( res )
       }
       callback()
     }
 
-    function info_status( res ) {
-      var code =
-        _colorcode_statusCode_fn( res.statusCode )
-          .call( this, res.statusCode )
-      var msg =
-        _colorcode_statusMessage_fn( res.statusCode )
-          .call( this, http.STATUS_CODES[res.statusCode] )
-      log.info( '  ', code, msg )
-    }
   }
   return stream
 }
@@ -202,6 +183,26 @@ function _gulp_prefix() {
   var name = '[' + chalk.grey( PLUGIN_NAME ) + ']'
   var item = chalk.grey( arguments[0] )
   return [ time, name, item ].join( ' ' )
+}
+
+function _info_status( res ) {
+  var code =
+    _colorcode_statusCode_fn( res.statusCode )
+      .call( this, res.statusCode )
+  var msg =
+    _colorcode_statusMessage_fn( res.statusCode )
+      .call( this, http.STATUS_CODES[res.statusCode] )
+  log.info( '  ', code, msg )
+}
+
+function _info_target( vinyl, uri ) {
+  if ( _options.logAuth !== true ) {
+    uri = _strip_url_auth( uri )
+  }
+  var from = chalk.underline.cyan( vinyl.path )
+  var to = chalk.underline.cyan( uri )
+  log.info( '  ', _align_right( to, from )[1] )
+  log.info( '  ', _align_right( to, from )[0] )
 }
 
 var log = ( function () {
