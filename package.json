@@ -30,13 +30,13 @@
     "jsDAV": "~0.3.2",
     "jshint-stylish": "~2.0.1",
     "mocha": "~2.2.5",
+    "npmconf": "~2.1.2",
     "run-sequence": "~1.1.1",
     "vinyl": "~0.5.0",
     "underscore": "~1.8.3"
   },
   "dependencies": {
     "chalk": "~1.1.0",
-    "gulp-util": "~3.0.6",
-    "npmconf": "~2.1.2"
+    "gulp-util": "~3.0.6"
   }
 }
