@@ -1,7 +1,6 @@
 var chalk = require( 'chalk' )
 var gutil = require( 'gulp-util' )
 var http = require( 'http' )
-var npmconf = require( 'npmconf' )
 var path = require( 'path' )
 var Stream = require( 'stream' )
 var underscore = require( 'underscore' )
@@ -30,11 +29,7 @@ module.exports = function () {
 
   stream = new Stream.Transform( { objectMode: true } )
   stream._transform = function ( vinyl, encoding, callback ) {
-    if ( !npmconf.loaded ) {
-      npmconf.load( null, init )
-    } else {
-      init()
-    }
+    init()
 
     function init() {
       const FN_NAME = 'main#init'
@@ -158,26 +153,6 @@ function _delete( uri, callback ) {
 function _get( uri, vinyl, callback ) {
 }
 
-function _get_npmrc_target() {
-  var href
-  if ( !npmconf.loaded ) {
-    throw new gutil.PluginError(
-        PLUGIN_NAME
-      , 'npmconf.loaded is false'
-    )
-  }
-  if ( npmconf.loaded.sources.global ) {
-    href = npmconf.loaded.sources.global.data.dav
-  }
-  if ( npmconf.loaded.sources.user ) {
-    href = npmconf.loaded.sources.user.data.dav
-  }
-  if ( npmconf.loaded.sources.project ) {
-    href = npmconf.loaded.sources.project.data.dav
-  }
-  return href
-}
-
 function _gulp_prefix() {
   var time = '[' + chalk.grey( ( new Date() ).toLocaleTimeString() ) + ']'
   var name = '[' + chalk.grey( PLUGIN_NAME ) + ']'
@@ -286,7 +261,11 @@ function _splice_target( vinyl_path, parent_dir, href ) {
   if ( href && path.toString() !== '' ) {
     return href + target_stem
   } else {
-    href = _get_npmrc_target()
+    error = new gutil.PluginError(
+        PLUGIN_NAME
+      , 'Must provide a URL target'
+    )
+    throw error
   }
   return href + target_stem
 }
