@@ -163,9 +163,6 @@ describe( PLUGIN_NAME, function () {
         }
     )
 
-  } )
-
-  describe( '#_mkdir', function () {
     it( 'Should create a directory on the server when vinyl.isNull()'
       , function ( done ) {
           var expected_path = path.join( node, MOCK )
@@ -181,9 +178,7 @@ describe( PLUGIN_NAME, function () {
           }
         }
     )
-  } )
 
-  describe( '#_put', function () {
     it( 'Should create a file on the server when vinyl.isBuffer()'
       , function ( done ) {
           var expected_path = path.join( node, MOCK )
@@ -200,6 +195,7 @@ describe( PLUGIN_NAME, function () {
           }
         }
     )
+
     it( 'Should create a file on the server when vinyl.isStream()'
       , function ( done ) {
           var expected_path = path.join( node, MOCK )
@@ -216,6 +212,7 @@ describe( PLUGIN_NAME, function () {
           }
         }
     )
+
     it( 'Should create a file from URL object in options'
       , function ( done ) {
           var expected_path = path.join( node, MOCK )
