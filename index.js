@@ -26,7 +26,25 @@ module.exports = function () {
       _options = underscore.extend( _options, arguments[i] )
     }
   }
-
+  if ( _options ) {
+    if ( _options.protocol
+      || _options.slashes
+      || _options.auth
+      || _options.port
+      || _options.hostname
+      || _options.pathname
+      ) {
+      if ( !_options.protocol ) {
+        _options.protocol = 'http:'
+      }
+      if ( !_options.host && !_options.hostname ) {
+        _options.hostname = 'localhost'
+      }
+      if ( !_options.pathname ) {
+        _options.pathname = '/'
+      }
+    }
+  }
   stream = new Stream.Transform( { objectMode: true } )
   stream._transform = function ( vinyl, encoding, callback ) {
     init()
@@ -41,6 +59,7 @@ module.exports = function () {
         } else {
           href = url.format( _options )
         }
+        log.log( _gulp_prefix( FN_NAME + '$href' ), href )
         target_uri = _splice_target(
             vinyl.path
           , path.resolve( _options.parent )
