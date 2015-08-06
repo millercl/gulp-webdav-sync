@@ -216,6 +216,23 @@ describe( PLUGIN_NAME, function () {
           }
         }
     )
+    it( 'Should create a file from URL object in options'
+      , function ( done ) {
+          var expected_path = path.join( node, MOCK )
+          var mock = new Vinyl( {
+            path: path.resolve( MOCK )
+            , contents: new Buffer( MOCK )
+          } )
+          assert( mock.isBuffer(), 'vinyl.isBuffer()' )
+          var uri = url.parse( HREF )
+          var unit = mod( uri )
+          unit.write( mock, null, validate )
+          function validate() {
+            assert( fs.existsSync( expected_path ), 'file exists' )
+            done()
+          }
+        }
+    )
   } )
 
 } )
