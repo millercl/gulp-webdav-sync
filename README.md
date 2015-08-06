@@ -56,6 +56,7 @@ gulp.task( 'deploy', function () {
   var options = {
       'log': 'info'
     , 'parent': 'dist'
+    , 'port': 8000
   }
   return gulp.src( 'dist/**' )
     .pipe( webdav( options ) )
@@ -120,7 +121,7 @@ gulp.task( 'deploy', function () {
 
 ## API
 
-### webdav( href [, options ] )
+### webdav( [ href ] [, options ] )
 Target is a URL-type parameter whereto files are uploaded. It must specify a directory ( also known as a "collection" ). At a minimum this must be DAV root, but subdirectories may be included ( *e.g.* project name ). Part-wise definition across multiple arguments is undefined. Use the `http:` scheme, not `dav:`.
 
 ## href
@@ -129,7 +130,7 @@ Target is a URL-type parameter whereto files are uploaded. It must specify a dir
 **Default:** `undefined`</br>
 
 ## options
-Superset of [http.request options parameter](https://nodejs.org/api/http.html#http_http_request_options_callback).
+Superset of [http.request options parameter](https://nodejs.org/api/http.html#http_http_request_options_callback), and [url.object](https://nodejs.org/api/url.html#url_url_format_urlobj). If any URL properties are defined, `protocol`, `hostname`, and `pathname` default to `http://localhost/`.
 
 **Type:** `Object`.</br>
 **Default:** `{}`
