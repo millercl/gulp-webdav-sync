@@ -12,7 +12,7 @@ var stream
 var _options
 
 module.exports = function () {
-  var _string = ''
+  var _string
   _options = {
     'log': 'error'
     , 'logAuth': false
@@ -35,10 +35,16 @@ module.exports = function () {
       const FN_NAME = 'main#init'
       var target_uri
       try {
+        var href
+        if ( _string ) {
+          href = _string
+        } else {
+          href = url.format( _options )
+        }
         target_uri = _splice_target(
             vinyl.path
           , path.resolve( _options.parent )
-          , _string
+          , href
         )
       } catch ( error ) {
         _on_error( error )
@@ -258,14 +264,8 @@ function _splice_target( vinyl_path, parent_dir, href ) {
     throw error
   }
   log.log( _gulp_prefix( FN_NAME + '$target_stem' ), target_stem )
-  if ( href && path.toString() !== '' ) {
-    return href + target_stem
-  } else {
-    error = new gutil.PluginError(
-        PLUGIN_NAME
-      , 'Must provide a URL target'
-    )
-    throw error
+  if ( !href ) {
+    href = ''
   }
   return href + target_stem
 }
