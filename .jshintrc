@@ -11,7 +11,7 @@
   , "globals": null
   , "iterator": false
   , "latedef": false
-  , "maxcomplexity": 15
+  , "maxcomplexity": false
   , "maxdepth": 5
   , "maxerr": 50
   , "maxparams": null
