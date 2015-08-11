@@ -71,7 +71,7 @@ module.exports = function () {
         return
       }
       log.log( _gulp_prefix( FN_NAME + '$target_uri' ), target_uri )
-      _info_target( vinyl, target_uri )
+      _info_target( vinyl.path, target_uri )
       if ( vinyl.isBuffer() ) {
         _put( target_uri, vinyl, resume )
         return
@@ -89,7 +89,7 @@ module.exports = function () {
 
     function resume( res ) {
       if ( res ) {
-        _info_status( res )
+        _info_status( res.statusCode )
       }
       callback()
     }
@@ -185,21 +185,21 @@ function _gulp_prefix() {
   return [ time, name, item ].join( ' ' )
 }
 
-function _info_status( res ) {
+function _info_status( statusCode ) {
   var code =
-    _colorcode_statusCode_fn( res.statusCode )
-      .call( this, res.statusCode )
+    _colorcode_statusCode_fn( statusCode )
+      .call( this, statusCode )
   var msg =
-    _colorcode_statusMessage_fn( res.statusCode )
-      .call( this, http.STATUS_CODES[res.statusCode] )
+    _colorcode_statusMessage_fn( statusCode )
+      .call( this, http.STATUS_CODES[statusCode] )
   log.info( '  ', code, msg )
 }
 
-function _info_target( vinyl, uri ) {
+function _info_target( vinyl_path, uri ) {
   if ( _options.logAuth !== true ) {
     uri = _strip_url_auth( uri )
   }
-  var from = chalk.underline.cyan( vinyl.path )
+  var from = chalk.underline.cyan( vinyl_path )
   var to = chalk.underline.cyan( uri )
   log.info( '  ', _align_right( to, from )[1] )
   log.info( '  ', _align_right( to, from )[0] )
