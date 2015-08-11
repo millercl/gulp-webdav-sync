@@ -175,6 +175,16 @@ function _colorcode_statusMessage_fn( statusMessage ) {
 }
 
 function _delete( uri, callback ) {
+  const FN_NAME = '#_delete'
+  var options, req
+  options = underscore.extend(
+      _options
+    , url.parse( uri )
+    , { method: 'DELETE' }
+  )
+  req = http.request( options, callback )
+  req.on( 'error', _on_error )
+  req.end()
 }
 
 function _get( uri, vinyl, callback ) {
