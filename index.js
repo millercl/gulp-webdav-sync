@@ -13,7 +13,8 @@ var _options
 module.exports = function () {
   var _string
   _options = {
-    'log': 'error'
+    'agent': false
+    , 'log': 'error'
     , 'logAuth': false
     , 'parent': process.cwd()
   }
