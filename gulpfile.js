@@ -16,6 +16,15 @@ gulp.task( 'int-test', [ '.npmrc' ], function () {
     .pipe( debug( { title: 'post' } ) )
 } )
 
+gulp.task( 'watch', [ '.npmrc' ], function () {
+  var options = {
+    'log': 'info'
+    , 'parent': 'test/assets'
+  }
+  gulp.watch( 'test/assets/**', [ 'int-test' ] )
+    .on( 'change', dav( href, options ).watch )
+} )
+
 gulp.task( 'src-test', function () {
   return gulp.src( [ '*.js', 'test/*.js' ] )
     .pipe( jshint() )
