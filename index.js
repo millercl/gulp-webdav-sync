@@ -53,10 +53,16 @@ module.exports = function () {
   }
   stream = new Stream.Transform( { objectMode: true } )
   stream._transform = function ( vinyl, encoding, callback ) {
+    const FN_NAME = '#main'
+    if ( vinyl.event ) {
+      log.log( _gulp_prefix( FN_NAME + '$vinyl.event' ), vinyl.event )
+    } else {
+      vinyl.event = null
+    }
     init()
 
     function init() {
-      const FN_NAME = 'main#init'
+      const FN_NAME = '#main#init'
       var target_uri
       try {
         log.log( _gulp_prefix( FN_NAME + '$href' ), href )
@@ -72,6 +78,10 @@ module.exports = function () {
       }
       log.log( _gulp_prefix( FN_NAME + '$target_uri' ), target_uri )
       _info_target( vinyl.path, target_uri )
+      if ( vinyl.event === 'unlink' ) {
+        _delete( target_uri, resume )
+        return
+      }
       if ( vinyl.isBuffer() ) {
         _put( target_uri, vinyl, resume )
         return
