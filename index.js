@@ -45,6 +45,12 @@ module.exports = function () {
       }
     }
   }
+  var href
+  if ( _string ) {
+    href = _string
+  } else {
+    href = url.format( _options )
+  }
   stream = new Stream.Transform( { objectMode: true } )
   stream._transform = function ( vinyl, encoding, callback ) {
     init()
@@ -53,12 +59,6 @@ module.exports = function () {
       const FN_NAME = 'main#init'
       var target_uri
       try {
-        var href
-        if ( _string ) {
-          href = _string
-        } else {
-          href = url.format( _options )
-        }
         log.log( _gulp_prefix( FN_NAME + '$href' ), href )
         target_uri = _splice_target(
             vinyl.path
@@ -94,6 +94,34 @@ module.exports = function () {
       callback()
     }
 
+  }
+  stream.watch = function ( glob_watcher, cb ) {
+    const FN_NAME = '#watch'
+    if ( typeof glob_watcher !== 'object'
+         || !glob_watcher.type
+         || !glob_watcher.path
+       ) {
+      throw new gutil.PluginError( PLUGIN_NAME, 'expected glob-watcher object' )
+    }
+    log.log( _gulp_prefix( FN_NAME + '$arguments[0].path' ), glob_watcher.path )
+    if ( glob_watcher.type === 'deleted' ) {
+      var target_uri = _splice_target(
+            glob_watcher.path
+          , path.resolve( _options.parent )
+          , href
+      )
+      _info_target( glob_watcher.path, target_uri )
+      _delete( target_uri, function ( res ) {
+        _info_status( res.statusCode )
+        if ( cb && typeof cb === 'function' ) {
+          cb()
+        }
+      } )
+    } else {
+      if ( cb && typeof cb === 'function' ) {
+        cb()
+      }
+    }
   }
   return stream
 }
