@@ -252,6 +252,59 @@ describe( PLUGIN_NAME, function () {
         }
     )
 
+    it( 'Should delete a file from a gulp-watch event'
+      , function ( done ) {
+          var expected_path = path.join( node, MOCK )
+          var file = fs.openSync( expected_path, 'w' )
+          fs.writeSync( file, MOCK )
+          fs.closeSync( file )
+          assert( fs.existsSync( expected_path ), 'file exists' )
+          var options = {
+          }
+          var unit = mod( HREF, options )
+          var mock = new Vinyl( {
+            path: path.resolve( MOCK )
+            , contents: new Buffer( MOCK )
+          } )
+          mock.event = 'unlink'
+          unit.write( mock, null, validate )
+          function validate() {
+            assert.equal(
+                fs.existsSync( expected_path )
+              , false
+              , 'file exists'
+            )
+            done()
+          }
+        }
+    )
+
+    it( 'Should delete a directory from a gulp-watch event'
+      , function ( done ) {
+          var expected_path = path.join( node, MOCK )
+          var file = fs.openSync( expected_path, 'w' )
+          fs.writeSync( file, MOCK )
+          fs.closeSync( file )
+          assert( fs.existsSync( expected_path ), 'file exists' )
+          var options = {
+          }
+          var unit = mod( HREF, options )
+          var mock = new Vinyl( {
+            path: path.resolve( MOCK )
+          } )
+          mock.event = 'unlink'
+          unit.write( mock, null, validate )
+          function validate() {
+            assert.equal(
+                fs.existsSync( expected_path )
+              , false
+              , 'file exists'
+            )
+            done()
+          }
+        }
+    )
+
   } )
 
   describe( '#main().watch', function () {
