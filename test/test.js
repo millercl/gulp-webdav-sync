@@ -254,4 +254,58 @@ describe( PLUGIN_NAME, function () {
 
   } )
 
+  describe( '#main().watch', function () {
+
+    it( 'Should delete a file from a glob-watcher event'
+      , function ( done ) {
+          var expected_path = path.join( node, MOCK )
+          var file = fs.openSync( expected_path, 'w' )
+          fs.writeSync( file, MOCK )
+          fs.closeSync( file )
+          assert( fs.existsSync( expected_path ), 'file exists' )
+          var options = {
+          }
+          var unit = mod( HREF, options )
+          var glob_watcher = {
+            type: 'deleted'
+            , path: path.resolve( MOCK )
+          }
+          unit.watch( glob_watcher, validate )
+          function validate() {
+            assert.equal(
+                fs.existsSync( expected_path )
+              , false
+              , 'file exists'
+            )
+            done()
+          }
+        }
+    )
+
+    it( 'Should delete a directory from a glob-watcher event'
+      , function ( done ) {
+          var expected_path = path.join( node, MOCK )
+          fs.mkdirSync( expected_path )
+          assert( fs.existsSync( expected_path ), 'dir exists' )
+          var options = {
+          }
+          var unit = mod( HREF, options )
+          var glob_watcher = {
+            type: 'deleted'
+            , path: path.resolve( MOCK )
+          }
+          unit.watch( glob_watcher, validate )
+          function validate() {
+            assert.equal(
+                fs.existsSync( expected_path )
+              , false
+              , 'file exists'
+            )
+            done()
+          }
+        }
+    )
+
+  } )
+
 } )
