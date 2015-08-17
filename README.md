@@ -147,7 +147,7 @@ Callback adapter for `'change'` events from `gulp.watch`. Only handles `type: 'd
 **Default:** `undefined`
 
 #### cb
-Optional asynchronous callback method.
+Optional, asynchronous, callback function.
 
 **Type:** `Function`</br>
 **Default:** `undefined`
