@@ -132,7 +132,7 @@ gulp.task( 'deploy', function () {
 Target is a URL-type parameter whereto files are uploaded. It must specify a directory ( also known as a "collection" ). At a minimum this must be DAV root, but subdirectories may be included ( *e.g.* project name ). Part-wise definition across multiple arguments is undefined. Use the `http:` scheme, not `dav:`.
 
 ### webdav( [ href ] [, options ] ).watch( event [, cb ] )
-Callback adapter for `change` events from `gulp.watch`. Only handles `type: 'deleted'` events. `gulp.src` does not push deleted files; use this or [gulp-watch](https://github.com/floatdrop/gulp-watch) instead. Calls back regardless of `event.type`.
+Callback adapter for `'change'` events from `gulp.watch`. Only handles `type: 'deleted'` events. `gulp.src` does not push deleted files; use this or [gulp-watch](https://github.com/floatdrop/gulp-watch) instead. Calls back regardless of `event.type`.
 
 #### event
 [glob-watcher](https://github.com/wearefractal/glob-watcher/blob/master/index.js#L10) event.
