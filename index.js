@@ -5,6 +5,7 @@ var path = require( 'path' )
 var Stream = require( 'stream' )
 var underscore = require( 'underscore' )
 var url = require( 'url' )
+var xml2js = require( 'xml2js' )
 
 const PLUGIN_NAME = 'gulp-webdav-sync'
 var stream
