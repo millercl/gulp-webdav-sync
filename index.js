@@ -142,6 +142,7 @@ module.exports = function () {
       target_uri = url.parse( _options )
     }
     log.log( _gulp_prefix( FN_NAME + '$target_uri' ), target_uri )
+    _options = underscore.extend( _options, { 'headers': { 'Depth': 1 } } )
     _propfind( target_uri, function () {
       if ( cb ) {
         cb()
