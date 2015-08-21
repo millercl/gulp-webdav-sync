@@ -133,6 +133,21 @@ module.exports = function () {
       }
     }
   }
+  stream.clean = function ( cb ) {
+    const FN_NAME = '#main#clean'
+    var target_uri
+    if ( _string ) {
+      target_uri = _string
+    } else {
+      target_uri = url.parse( _options )
+    }
+    log.log( _gulp_prefix( FN_NAME + '$target_uri' ), target_uri )
+    _propfind( target_uri, function () {
+      if ( cb ) {
+        cb()
+      }
+    } )
+  }
   return stream
 }
 
@@ -285,6 +300,23 @@ function _on_error( error ) {
 }
 
 function _propfind( uri, callback ) {
+  var options, req
+  options = underscore.extend(
+      _options
+    , url.parse( uri )
+    , { method: 'PROPFIND' }
+  )
+  req = http.request( options, function ( res ) {
+    var body = ''
+    res.on( 'data', function ( chunk ) {
+      body += chunk
+    } )
+    res.on( 'end', function () {
+      callback()
+    } )
+  } )
+  req.on( 'error', _on_error )
+  req.end()
 }
 
 function _proppatch( uri, props, callback ) {
