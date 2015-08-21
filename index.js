@@ -315,7 +315,14 @@ function _propfind( uri, callback ) {
       body += chunk
     } )
     res.on( 'end', function () {
-      callback()
+      var opt = {
+      }
+      xml2js.parseString( body, opt, function ( err, result ) {
+        if ( err ) {
+          _on_error( err )
+        }
+        callback( result )
+      } )
     } )
   } )
   req.on( 'error', _on_error )
