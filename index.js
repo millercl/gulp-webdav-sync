@@ -143,7 +143,8 @@ module.exports = function () {
     }
     log.log( _gulp_prefix( FN_NAME + '$target_uri' ), target_uri )
     _options = underscore.extend( _options, { 'headers': { 'Depth': 1 } } )
-    _propfind( target_uri, function () {
+    _propfind( target_uri, function ( dom ) {
+      var urls = _xml_to_url_a( dom )
       if ( cb ) {
         cb()
       }
@@ -376,4 +377,7 @@ function _strip_url_auth( href ) {
   var strip = url.parse( href )
   strip.auth = null
   return strip.format()
+}
+
+function _xml_to_url_a( dom ) {
 }
