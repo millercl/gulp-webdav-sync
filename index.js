@@ -316,6 +316,7 @@ function _propfind( uri, callback ) {
     } )
     res.on( 'end', function () {
       var opt = {
+        tagNameProcessors: [ xml2js.processors.stripPrefix ]
       }
       xml2js.parseString( body, opt, function ( err, result ) {
         if ( err ) {
@@ -388,4 +389,13 @@ function _strip_url_auth( href ) {
 }
 
 function _xml_to_url_a( dom ) {
+  var a = []
+  try {
+    dom.multistatus.response.forEach( function ( e ) {
+      a.push( e.href[0] )
+    } )
+  } catch ( e ) {
+    throw e
+  }
+  return a
 }
