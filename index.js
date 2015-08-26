@@ -146,9 +146,31 @@ module.exports = function () {
     _options = underscore.extend( _options, { 'headers': { 'Depth': 1 } } )
     _propfind( target_uri, function ( dom ) {
       var urls = _xml_to_url_a( dom )
-      if ( cb ) {
-        cb()
+      urls = urls.map(
+        function ( e ) {
+          return url.resolve( target_uri, e )
+        }
+      ).filter(
+        function ( e ) {
+          return e !== target_uri
+        }
+      )
+      log.log( 'postmap', urls )
+      function d( urls ) {
+        if ( urls.length > 0 ) {
+          _delete( urls.pop()
+            , function ( res ) {
+                _info_status( res.statusCode )
+                d( urls )
+              }
+          )
+        } else {
+          if ( cb ) {
+            cb()
+          }
+        }
       }
+      d( urls )
     } )
   }
   return stream
