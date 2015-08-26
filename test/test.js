@@ -361,4 +361,48 @@ describe( PLUGIN_NAME, function () {
 
   } )
 
+  describe( '#main().clean', function () {
+
+    it( 'Should delete all files under target'
+      , function ( done ) {
+          var expected_file = path.join( node, 'file' )
+          var expected_dir = path.join( node, 'dir' )
+          var expected_sub = path.join( node, 'dir/file' )
+          var file = fs.openSync( expected_file, 'w' )
+          fs.writeSync( file, MOCK )
+          fs.closeSync( file )
+          fs.mkdirSync( expected_dir )
+          var sub = fs.openSync( expected_sub, 'w' )
+          fs.writeSync( sub, MOCK )
+          fs.closeSync( sub )
+          assert( fs.existsSync( expected_file ), 'file exists' )
+          assert( fs.existsSync( expected_dir ), 'dir exists' )
+          assert( fs.existsSync( expected_sub ), 'sub exists' )
+          var options = {
+          }
+          var unit = mod( HREF, options )
+          unit.clean( validate )
+          function validate() {
+            assert.equal(
+                fs.existsSync( expected_file )
+              , false
+              , 'file exists'
+            )
+            assert.equal(
+                fs.existsSync( expected_dir )
+              , false
+              , 'dir exists'
+            )
+            assert.equal(
+                fs.existsSync( expected_sub )
+              , false
+              , 'sub exists'
+            )
+            done()
+          }
+        }
+    )
+
+  } )
+
 } )
