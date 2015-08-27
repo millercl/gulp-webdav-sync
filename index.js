@@ -223,6 +223,7 @@ function _colorcode_statusCode_fn( statusCode ) {
     case 422:
     case 423:
     case 424:
+    case 500:
     case 502:
     case 507:
       return chalk.bgRed.white
@@ -249,6 +250,7 @@ function _colorcode_statusMessage_fn( statusMessage ) {
     case 422:
     case 423:
     case 424:
+    case 500:
     case 502:
     case 507:
       return chalk.red
