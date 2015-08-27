@@ -53,6 +53,7 @@ module.exports = function () {
   } else {
     href = url.format( _options )
   }
+  _info_target( href )
   stream = new Stream.Transform( { objectMode: true } )
   stream._transform = function ( vinyl, encoding, callback ) {
     const FN_NAME = '#main'
@@ -66,9 +67,15 @@ module.exports = function () {
     function init() {
       const FN_NAME = '#main#init'
       var target_uri
+      var target_stem
       try {
         log.log( _gulp_prefix( FN_NAME + '$href' ), href )
         target_uri = _splice_target(
+            vinyl.path
+          , path.resolve( _options.parent )
+          , href
+        )
+        target_stem = _splice_target_stem(
             vinyl.path
           , path.resolve( _options.parent )
           , href
@@ -79,7 +86,7 @@ module.exports = function () {
         return
       }
       log.log( _gulp_prefix( FN_NAME + '$target_uri' ), target_uri )
-      _info_target( vinyl.path, target_uri )
+      _info_path( target_stem )
       if ( vinyl.event === 'unlink' ) {
         _delete( target_uri, resume )
         return
@@ -126,7 +133,12 @@ module.exports = function () {
           , path.resolve( _options.parent )
           , href
       )
-      _info_target( glob_watcher.path, target_uri )
+      var target_stem = _splice_target_stem(
+            glob_watcher.path
+          , path.resolve( _options.parent )
+          , href
+      )
+      _info_path( target_stem )
       _delete( target_uri, function ( res ) {
         _info_status( res.statusCode )
         if ( cb && typeof cb === 'function' ) {
@@ -179,30 +191,6 @@ module.exports = function () {
     } )
   }
   return stream
-}
-
-function _align_right() {
-  var max = underscore.chain( arguments )
-    .map( function ( x ) {
-      return x.length
-    } )
-    .max()
-    .value()
-  return underscore.map(
-      arguments
-    , function ( x ) {
-        var diff = max - x.length
-        var pref = []
-        underscore.times(
-            diff
-          , function () {
-              pref.push( ' ' )
-            }
-        )
-        pref.push( x )
-        return pref.join( '' )
-      }
-  )
 }
 
 function _colorcode_statusCode_fn( statusCode ) {
@@ -276,10 +264,17 @@ function _get( uri, vinyl, callback ) {
 }
 
 function _gulp_prefix() {
-  var time = '[' + chalk.grey( ( new Date() ).toLocaleTimeString() ) + ']'
   var name = '[' + chalk.grey( PLUGIN_NAME ) + ']'
-  var item = chalk.grey( arguments[0] )
-  return [ time, name, item ].join( ' ' )
+  var item = ''
+  for ( var i = 0 ; i < arguments.length ; i++ ) {
+    item += chalk.grey( arguments[i] )
+  }
+  return [ name, item ].join( ' ' )
+}
+
+function _info_path( string ) {
+  var out = chalk.underline( string )
+  log.info( _gulp_prefix(), out )
 }
 
 function _info_status( statusCode ) {
@@ -292,14 +287,12 @@ function _info_status( statusCode ) {
   log.info( '  ', code, msg )
 }
 
-function _info_target( vinyl_path, uri ) {
+function _info_target( uri ) {
   if ( _options.logAuth !== true ) {
     uri = _strip_url_auth( uri )
   }
-  var from = chalk.underline.cyan( vinyl_path )
   var to = chalk.underline.cyan( uri )
-  log.info( '  ', _align_right( to, from )[1] )
-  log.info( '  ', _align_right( to, from )[0] )
+  log.info( _gulp_prefix(), to )
 }
 
 var log = ( function () {
@@ -391,6 +384,17 @@ function _splice_target( vinyl_path, parent_dir, href ) {
     error.parent = parent_dir
     throw error
   }
+  target_stem = _splice_target_stem( vinyl_path, parent_dir, href )
+  if ( !href ) {
+    href = ''
+  }
+  return href + target_stem
+}
+
+function _splice_target_stem( vinyl_path, parent_dir, href ) {
+  const FN_NAME = '#_splice_target_stem'
+  var error
+  var target_stem
   if ( vinyl_path.substr( 0, parent_dir.length ) === parent_dir ) {
     target_stem = vinyl_path.substr( parent_dir.length+1 )
   } else {
@@ -404,11 +408,7 @@ function _splice_target( vinyl_path, parent_dir, href ) {
     error.parent = parent_dir
     throw error
   }
-  log.log( _gulp_prefix( FN_NAME + '$target_stem' ), target_stem )
-  if ( !href ) {
-    href = ''
-  }
-  return href + target_stem
+  return target_stem
 }
 
 function _strip_url_auth( href ) {
