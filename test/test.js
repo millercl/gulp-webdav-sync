@@ -305,6 +305,54 @@ describe( PLUGIN_NAME, function () {
         }
     )
 
+    it( 'Should clean files on option'
+      , function ( done ) {
+          var expected_file = path.join( node, 'file' )
+          var expected_dir = path.join( node, 'dir' )
+          var expected_sub = path.join( node, 'dir/file' )
+          var file = fs.openSync( expected_file, 'w' )
+          fs.writeSync( file, MOCK )
+          fs.closeSync( file )
+          fs.mkdirSync( expected_dir )
+          var sub = fs.openSync( expected_sub, 'w' )
+          fs.writeSync( sub, MOCK )
+          fs.closeSync( sub )
+          assert( fs.existsSync( expected_file ), 'file exists' )
+          assert( fs.existsSync( expected_dir ), 'dir exists' )
+          assert( fs.existsSync( expected_sub ), 'sub exists' )
+          var mock_file = new Vinyl( { path: path.resolve( 'file' ) } )
+          var mock_dir = new Vinyl( { path: path.resolve( 'dir' ) } )
+          var mock_sub = new Vinyl( { path: path.resolve( 'dir/file' ) } )
+          var options = {
+            clean: true
+          }
+          var unit = mod( HREF, options )
+          unit.write( mock_file, null, function () {
+            unit.write( mock_dir, null, function () {
+              unit.write( mock_sub, null, validate )
+            } )
+          } )
+          function validate() {
+            assert.equal(
+                fs.existsSync( expected_file )
+              , false
+              , 'file exists'
+            )
+            assert.equal(
+                fs.existsSync( expected_dir )
+              , false
+              , 'dir exists'
+            )
+            assert.equal(
+                fs.existsSync( expected_sub )
+              , false
+              , 'sub exists'
+            )
+            done()
+          }
+        }
+    )
+
   } )
 
   describe( '#main().watch', function () {

@@ -131,6 +131,9 @@ gulp.task( 'deploy', function () {
 ### webdav( [ href ] [, options ] )
 Target is a URL-type parameter whereto files are uploaded. It must specify a directory ( also known as a "collection" ). At a minimum this must be DAV root, but subdirectories may be included ( *e.g.* project name ). Part-wise definition across multiple arguments is undefined. Use the `http:` scheme, not `dav:`.
 
+### webdav( [ href ] [, options ] ).clean( [ cb ] )
+Deletes all resources under `href`.
+
 ### webdav( [ href ] [, options ] ).watch( event [, cb ] )
 Callback adapter for `'change'` events from `gulp.watch`. Only handles `type: 'deleted'` events. `gulp.src` does not push deleted files; use this or [gulp-watch](https://github.com/floatdrop/gulp-watch) instead. Calls back regardless of `event.type`.
 
@@ -165,11 +168,18 @@ Superset of [http.request options parameter](https://nodejs.org/api/http.html#ht
 ```js
 {
     'agent': false
+  , 'clean': false
   , 'log': 'error'
   , 'logAuth': false
   , 'parent': process.cwd()
 }
 ```
+
+### options.clean
+Deletes corresponding resources on server instead of uploading. Note, glob star-star will delete directories before contents are pushed.
+
+**Type:** `Boolean`</br>
+**Default:** `false`
 
 ### options.log
 Logging threshold. Orthogonal to the `console` methods.
