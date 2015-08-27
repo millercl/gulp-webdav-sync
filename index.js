@@ -3,7 +3,42 @@ var gutil = require( 'gulp-util' )
 var http = require( 'http' )
 var path = require( 'path' )
 var Stream = require( 'stream' )
-var underscore = require( 'underscore' )
+if ( !Object.assign ) {
+  Object.defineProperty( Object, 'assign', {
+    configurable: true
+    , enumerable: false
+    , value: function ( target ) {
+      if ( target === undefined || target === null ) {
+        throw new TypeError( 'Cannot convert first argument to object' )
+      }
+      var to = Object( target )
+      var nextSource
+      for ( var i = 1 ; i < arguments.length ; i++ ) {
+        nextSource = arguments[i]
+        if ( nextSource === undefined || nextSource === null ) {
+          continue
+        }
+        nextSource = Object( nextSource )
+        var keysArray = Object.keys( Object( nextSource ) )
+        keysArray.forEach( assignKey )
+      }
+      function assignKey( e, i, a ) {
+        var nextKey = a[i]
+        var desc = Object.getOwnPropertyDescriptor( nextSource, nextKey )
+        if ( desc !== undefined && desc.enumerable ) {
+          to[nextKey] = nextSource[nextKey]
+        }
+      }
+      return to
+    }
+    , writable: true
+  } )
+}
+var underscore = {
+  extend: function () {
+    return Object.assign.apply( null, arguments )
+  }
+}
 var url = require( 'url' )
 var xml2js = require( 'xml2js' )
 
