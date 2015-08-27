@@ -15,6 +15,7 @@ module.exports = function () {
   var _string
   _options = {
     'agent': false
+    , 'clean': false
     , 'log': 'error'
     , 'logAuth': false
     , 'parent': process.cwd()
@@ -80,6 +81,10 @@ module.exports = function () {
       log.log( _gulp_prefix( FN_NAME + '$target_uri' ), target_uri )
       _info_target( vinyl.path, target_uri )
       if ( vinyl.event === 'unlink' ) {
+        _delete( target_uri, resume )
+        return
+      }
+      if ( _options.clean ) {
         _delete( target_uri, resume )
         return
       }
