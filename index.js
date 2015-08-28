@@ -120,6 +120,10 @@ module.exports = function () {
         callback( null, vinyl )
         return
       }
+      if ( target_uri === href ) {
+        callback()
+        return
+      }
       log.log( _gulp_prefix( FN_NAME + '$target_uri' ), target_uri )
       _info_path( target_stem )
       if ( vinyl.event === 'unlink' ) {
