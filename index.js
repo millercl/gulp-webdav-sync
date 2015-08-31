@@ -85,10 +85,14 @@ module.exports = function () {
   var href
   if ( _string ) {
     href = _string
-  } else {
+  } else
+  if ( url.format( _options ) !== '' ) {
     href = url.format( _options )
+  } else {
+    href = 'http://localhost/'
   }
   _info_target( href )
+
   stream = new Stream.Transform( { objectMode: true } )
   stream._transform = function ( vinyl, encoding, callback ) {
     const FN_NAME = '#main'
@@ -192,12 +196,7 @@ module.exports = function () {
   }
   stream.clean = function ( cb ) {
     const FN_NAME = '#main#clean'
-    var target_uri
-    if ( _string ) {
-      target_uri = _string
-    } else {
-      target_uri = url.parse( _options )
-    }
+    var target_uri = href
     log.log( _gulp_prefix( FN_NAME + '$target_uri' ), target_uri )
     _options = underscore.extend( _options, { 'headers': { 'Depth': 1 } } )
     _propfind( target_uri, function ( dom ) {
