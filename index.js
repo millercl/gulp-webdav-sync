@@ -391,6 +391,37 @@ function _propfind( uri, callback ) {
 }
 
 function _proppatch( uri, props, callback ) {
+  var options, xml, req
+  options = underscore.extend(
+      _options
+    , url.parse( uri )
+    , { method: 'PROPPATCH' }
+    , { headers: { 'Content-Type': 'text/xml; charset="utf-8"' } }
+  )
+  xml = ( new xml2js.Builder() ).buildObject( props )
+  req = http.request( options, callback )
+  req.on( 'error', _on_error )
+  req.write( xml )
+  req.end()
+}
+
+function _proppatch_( href, date, cb ) {
+  var dom = {
+    'd:propertyupdate': {
+      $: {
+        'xmlns:d': 'DAV:'
+      }
+      , 'd:set': {
+          'd:prop': {
+            'd:creationdate': date.toJSON()
+            , 'd:resourcetype': { 'd:collection': null }
+          }
+        }
+    }
+  }
+  _proppatch( href, dom, function ( res ) {
+    cb( res )
+  } )
 }
 
 function _put( uri, vinyl, callback ) {
