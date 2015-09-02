@@ -197,7 +197,6 @@ module.exports = function () {
   stream.clean = function ( cb ) {
     const FN_NAME = '#main#clean'
     var target_uri = href
-    log.log( _gulp_prefix( FN_NAME + '$target_uri' ), target_uri )
     _options = underscore.extend( _options, { 'headers': { 'Depth': 1 } } )
     _propfind( target_uri, function ( dom ) {
       var urls = _xml_to_url_a( dom )
@@ -210,7 +209,6 @@ module.exports = function () {
           return e !== target_uri
         }
       )
-      log.log( 'postmap', urls )
       function d( urls ) {
         if ( urls.length > 0 ) {
           _delete( urls.pop()
