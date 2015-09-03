@@ -97,14 +97,14 @@ module.exports = function () {
   stream._transform = function ( vinyl, encoding, callback ) {
     const FN_NAME = '#main'
     if ( vinyl.event ) {
-      log.log( _gulp_prefix( FN_NAME + '$vinyl.event' ), vinyl.event )
+      log.var( '$vinyl.event', vinyl.event )
     } else {
       vinyl.event = null
     }
     var target_uri
     var target_stem
     try {
-      log.log( _gulp_prefix( FN_NAME + '$href' ), href )
+      log.var( '$href', href )
       target_uri = _splice_target(
           vinyl.path
         , path.resolve( _options.parent )
@@ -128,7 +128,7 @@ module.exports = function () {
         callback()
         return
       }
-      log.log( _gulp_prefix( FN_NAME + '$target_uri' ), target_uri )
+      log.var( '$target_uri', target_uri )
       _info_path( target_stem )
       if ( vinyl.event === 'unlink' ) {
         _delete( target_uri, resume )
@@ -144,7 +144,10 @@ module.exports = function () {
       }
       if ( vinyl.isNull() ) {
         if ( vinyl.stat && !vinyl.stat.isDirectory() ) {
-          log.warn( _gulp_prefix(), vinyl.path + ' is not a directory.' )
+          log.warn(
+              _gulp_prefix( 'warn' )
+            , vinyl.path + ' is not a directory.'
+          )
         }
         _mkcol( target_uri, resume )
         return
@@ -172,7 +175,7 @@ module.exports = function () {
        ) {
       throw new gutil.PluginError( PLUGIN_NAME, 'expected glob-watcher object' )
     }
-    log.log( _gulp_prefix( FN_NAME + '$arguments[0].path' ), glob_watcher.path )
+    log.var( 'glob_watcher.path', glob_watcher.path )
     if ( glob_watcher.type === 'deleted' ) {
       var target_uri = _splice_target(
             glob_watcher.path
@@ -303,16 +306,21 @@ function _get( uri, vinyl, callback ) {
 }
 
 function _gulp_prefix() {
-  var name = '[' + chalk.grey( PLUGIN_NAME ) + ']'
-  var item = ''
-  for ( var i = 0 ; i < arguments.length ; i++ ) {
-    item += chalk.grey( arguments[i] )
+  function bracket( string ) {
+    if ( typeof string === 'string' ) {
+      return '[' + chalk.grey( string ) + ']'
+    } else {
+      return ''
+    }
   }
-  return [ name, item ].join( ' ' )
+  return [ PLUGIN_NAME ]
+    .concat( Array.prototype.slice.call( arguments ) )
+    .map( bracket )
+    .join( ' ' )
 }
 
 function _info_path( string ) {
-  var out = chalk.underline( string )
+  var out = string
   log.info( _gulp_prefix(), out )
 }
 
@@ -330,7 +338,7 @@ function _info_target( uri ) {
   if ( _options.logAuth !== true ) {
     uri = _strip_url_auth( uri )
   }
-  var to = chalk.underline.cyan( uri )
+  var to = chalk.blue( uri )
   log.info( _gulp_prefix(), to )
 }
 
@@ -346,6 +354,12 @@ var log = ( function () {
   } )
   return _log
 } )()
+
+log.var = function () {
+  var args = Array.prototype.slice.call( arguments )
+  var last = args.pop()
+  log.log( _gulp_prefix( 'log' ), chalk.grey( args.join( ' ' ) ), last )
+}
 
 function _mkcol( uri, callback ) {
   var options, req
@@ -410,8 +424,8 @@ function _splice_target( vinyl_path, parent_dir, href ) {
   const FN_NAME = '#_splice_target'
   var error
   var target_stem = ''
-  log.log( _gulp_prefix( FN_NAME + '$vinyl_path' ), vinyl_path )
-  log.log( _gulp_prefix( FN_NAME + '$parent_dir' ), parent_dir )
+  log.var( '$vinyl_path', vinyl_path )
+  log.var( '$parent_dir', parent_dir )
   if ( vinyl_path.length < parent_dir.length ) {
     error = new gutil.PluginError(
         PLUGIN_NAME
