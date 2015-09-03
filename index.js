@@ -101,29 +101,29 @@ module.exports = function () {
     } else {
       vinyl.event = null
     }
+    var target_uri
+    var target_stem
+    try {
+      log.log( _gulp_prefix( FN_NAME + '$href' ), href )
+      target_uri = _splice_target(
+          vinyl.path
+        , path.resolve( _options.parent )
+        , href
+      )
+      target_stem = _splice_target_stem(
+          vinyl.path
+        , path.resolve( _options.parent )
+        , href
+      )
+    } catch ( error ) {
+      _on_error( error )
+      callback( null, vinyl )
+      return
+    }
     init()
 
     function init() {
       const FN_NAME = '#main#init'
-      var target_uri
-      var target_stem
-      try {
-        log.log( _gulp_prefix( FN_NAME + '$href' ), href )
-        target_uri = _splice_target(
-            vinyl.path
-          , path.resolve( _options.parent )
-          , href
-        )
-        target_stem = _splice_target_stem(
-            vinyl.path
-          , path.resolve( _options.parent )
-          , href
-        )
-      } catch ( error ) {
-        _on_error( error )
-        callback( null, vinyl )
-        return
-      }
       if ( target_uri === href ) {
         callback()
         return
