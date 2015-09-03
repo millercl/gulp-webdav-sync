@@ -143,6 +143,9 @@ module.exports = function () {
         return
       }
       if ( vinyl.isNull() ) {
+        if ( vinyl.stat && !vinyl.stat.isDirectory() ) {
+          log.warn( _gulp_prefix(), vinyl.path + ' is not a directory.' )
+        }
         _mkcol( target_uri, resume )
         return
       }
