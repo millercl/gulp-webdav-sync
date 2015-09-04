@@ -95,7 +95,6 @@ module.exports = function () {
 
   stream = new Stream.Transform( { objectMode: true } )
   stream._transform = function ( vinyl, encoding, callback ) {
-    const FN_NAME = '#main'
     if ( vinyl.event ) {
       log.var( '$vinyl.event', vinyl.event )
     } else {
@@ -123,7 +122,6 @@ module.exports = function () {
     init()
 
     function init() {
-      const FN_NAME = '#main#init'
       if ( target_uri === href ) {
         callback()
         return
@@ -168,7 +166,6 @@ module.exports = function () {
 
   }
   stream.watch = function ( glob_watcher, cb ) {
-    const FN_NAME = '#watch'
     if ( typeof glob_watcher !== 'object'
          || !glob_watcher.type
          || !glob_watcher.path
@@ -201,7 +198,6 @@ module.exports = function () {
     }
   }
   stream.clean = function ( cb ) {
-    const FN_NAME = '#main#clean'
     _options = underscore.extend( _options, { 'headers': { 'Depth': 1 } } )
     _propfind( href, function ( dom ) {
       var url_paths = _xml_to_url_a( dom )
@@ -289,7 +285,6 @@ function _colorcode_statusMessage_fn( statusMessage ) {
 }
 
 function _delete( uri, callback ) {
-  const FN_NAME = '#_delete'
   var options, req
   options = underscore.extend(
       _options
@@ -420,7 +415,6 @@ function _put( uri, vinyl, callback ) {
 }
 
 function _splice_target( vinyl_path, parent_dir, href ) {
-  const FN_NAME = '#_splice_target'
   var error
   var target_stem = ''
   log.var( '$vinyl_path', vinyl_path )
@@ -444,7 +438,6 @@ function _splice_target( vinyl_path, parent_dir, href ) {
 }
 
 function _splice_target_stem( vinyl_path, parent_dir, href ) {
-  const FN_NAME = '#_splice_target_stem'
   var error
   var target_stem
   if ( vinyl_path.substr( 0, parent_dir.length ) === parent_dir ) {
