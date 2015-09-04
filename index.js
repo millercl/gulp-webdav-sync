@@ -202,25 +202,24 @@ module.exports = function () {
   }
   stream.clean = function ( cb ) {
     const FN_NAME = '#main#clean'
-    var target_uri = href
     _options = underscore.extend( _options, { 'headers': { 'Depth': 1 } } )
-    _propfind( target_uri, function ( dom ) {
-      var urls = _xml_to_url_a( dom )
-      urls = urls.map(
-        function ( e ) {
-          return url.resolve( target_uri, e )
+    _propfind( href, function ( dom ) {
+      var url_paths = _xml_to_url_a( dom )
+      url_paths = url_paths.map(
+        function ( url_path ) {
+          return url.resolve( href, url_path )
         }
       ).filter(
-        function ( e ) {
-          return e !== target_uri
+        function ( url_path ) {
+          return url_path !== href
         }
       )
-      function d( urls ) {
-        if ( urls.length > 0 ) {
-          _delete( urls.pop()
+      function recursive_delete( url_paths ) {
+        if ( url_paths.length > 0 ) {
+          _delete( url_paths.pop()
             , function ( res ) {
                 _info_status( res.statusCode )
-                d( urls )
+                recursive_delete( url_paths )
               }
           )
         } else {
@@ -229,7 +228,7 @@ module.exports = function () {
           }
         }
       }
-      d( urls )
+      recursive_delete( url_paths )
     } )
   }
   return stream
