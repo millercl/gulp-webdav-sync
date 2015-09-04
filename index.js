@@ -100,11 +100,11 @@ module.exports = function () {
     } else {
       vinyl.event = null
     }
-    var target_uri
+    var target_url
     var target_stem
     try {
       log.var( '$href', href )
-      target_uri = _splice_target(
+      target_url = _splice_target(
           vinyl.path
         , path.resolve( _options.parent )
         , href
@@ -122,22 +122,22 @@ module.exports = function () {
     init()
 
     function init() {
-      if ( target_uri === href ) {
+      if ( target_url === href ) {
         callback()
         return
       }
-      log.var( '$target_uri', target_uri )
+      log.var( '$target_url', target_url )
       _info_path( target_stem )
       if ( vinyl.event === 'unlink' ) {
-        _delete( target_uri, resume )
+        _delete( target_url, resume )
         return
       }
       if ( _options.clean ) {
-        _delete( target_uri, resume )
+        _delete( target_url, resume )
         return
       }
       if ( vinyl.isBuffer() ) {
-        _put( target_uri, vinyl, resume )
+        _put( target_url, vinyl, resume )
         return
       }
       if ( vinyl.isNull() ) {
@@ -147,11 +147,11 @@ module.exports = function () {
             , vinyl.path + ' is not a directory.'
           )
         }
-        _mkcol( target_uri, resume )
+        _mkcol( target_url, resume )
         return
       }
       if ( vinyl.isStream() ) {
-        _put( target_uri, vinyl, resume )
+        _put( target_url, vinyl, resume )
         return
       }
       callback( null, vinyl )
@@ -165,7 +165,7 @@ module.exports = function () {
     }
 
   }
-  stream.watch = function ( glob_watcher, cb ) {
+  stream.watch = function ( glob_watcher, callback ) {
     if ( typeof glob_watcher !== 'object'
          || !glob_watcher.type
          || !glob_watcher.path
@@ -174,7 +174,7 @@ module.exports = function () {
     }
     log.var( 'glob_watcher.path', glob_watcher.path )
     if ( glob_watcher.type === 'deleted' ) {
-      var target_uri = _splice_target(
+      var target_url = _splice_target(
             glob_watcher.path
           , path.resolve( _options.parent )
           , href
@@ -185,19 +185,19 @@ module.exports = function () {
           , href
       )
       _info_path( target_stem )
-      _delete( target_uri, function ( res ) {
+      _delete( target_url, function ( res ) {
         _info_status( res.statusCode )
-        if ( cb && typeof cb === 'function' ) {
-          cb()
+        if ( callback && typeof callback === 'function' ) {
+          callback()
         }
       } )
     } else {
-      if ( cb && typeof cb === 'function' ) {
-        cb()
+      if ( callback && typeof callback === 'function' ) {
+        callback()
       }
     }
   }
-  stream.clean = function ( cb ) {
+  stream.clean = function ( callback ) {
     _options = underscore.extend( _options, { 'headers': { 'Depth': 1 } } )
     _propfind( href, function ( dom ) {
       var url_paths = _xml_to_url_a( dom )
@@ -219,8 +219,8 @@ module.exports = function () {
               }
           )
         } else {
-          if ( cb ) {
-            cb()
+          if ( callback ) {
+            callback()
           }
         }
       }
