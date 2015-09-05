@@ -1,3 +1,13 @@
 node_modules
 .npmrc
 tmp
+test/assets/certs/
+test/assets/index.txt
+test/assets/index.txt.attr
+test/assets/index.txt.attr.old
+test/assets/index.txt.old
+test/assets/newcerts/
+test/assets/pkcs10/
+test/assets/private/
+test/assets/serial
+test/assets/serial.old
