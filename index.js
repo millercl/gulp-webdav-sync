@@ -379,15 +379,15 @@ function _propfind( uri, callback ) {
     , { method: 'PROPFIND' }
   )
   req = http.request( options, function ( res ) {
-    var body = ''
+    var content = ''
     res.on( 'data', function ( chunk ) {
-      body += chunk
+      content += chunk
     } )
     res.on( 'end', function () {
       var opt = {
         tagNameProcessors: [ xml2js.processors.stripPrefix ]
       }
-      xml2js.parseString( body, opt, function ( err, result ) {
+      xml2js.parseString( content, opt, function ( err, result ) {
         if ( err ) {
           _on_error( err )
         }
@@ -463,13 +463,13 @@ function _strip_url_auth( href ) {
 }
 
 function _xml_to_url_a( dom ) {
-  var a = []
+  var relative_urls = []
   try {
-    dom.multistatus.response.forEach( function ( e ) {
-      a.push( e.href[0] )
+    dom.multistatus.response.forEach( function ( response ) {
+      relative_urls.push( response.href[0] )
     } )
-  } catch ( e ) {
-    throw e
+  } catch ( error ) {
+    throw error
   }
-  return a
+  return relative_urls
 }
