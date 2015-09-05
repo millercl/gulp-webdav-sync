@@ -4,9 +4,11 @@ var del = require( 'del' )
 var es = require( 'event-stream' )
 var fs = require( 'fs' )
 var mod = require( '../index' )
+var net = require( 'net' )
 var npmconf = require( 'npmconf' )
 var os = require( 'os' )
 var path = require( 'path' )
+var tls = require( 'tls' )
 var url = require( 'url' )
 var Vinyl = require( 'vinyl' )
 
@@ -14,9 +16,13 @@ const PLUGIN_NAME = 'gulp-webdav-sync'
 const HREF = 'http://localhost:8000/'
 const MOCK = 'mock'
 const TEMP = 'tmp'
+const TLS_PORT = 8443
+const CA_CERT = './test/assets/certs/ca.pem'
+const SRV_CERT = './test/assets/certs/localhost.pem'
+const SRV_KEY = './test/assets/private/localhost.pem'
 
 describe( PLUGIN_NAME, function () {
-  var node
+  var node, tls_tunnel
   before( function ( done ) {
     npmconf.load( null, function () {
       node = path.join( npmconf.loaded.prefix, TEMP )
@@ -28,14 +34,37 @@ describe( PLUGIN_NAME, function () {
       var opt = { node: node }
       var srv = dav.mount( opt )
       srv.listen( uri.port, uri.hostname, function () {
-        done()
+        start_tls( done )
       } )
     } )
+    function start_tls( done ) {
+      var opt = {
+        cert: fs.readFileSync( SRV_CERT )
+        , key: fs.readFileSync( SRV_KEY )
+      }
+      tls_tunnel = tls.createServer( opt, function ( s ) {
+        var c = net.connect( url.parse( HREF ).port )
+        c.pipe( s )
+        s.pipe( c )
+        s.on( 'end'
+          , function () {
+              c.end()
+            }
+        )
+        c.on( 'end'
+          , function () {
+              s.end()
+            }
+        )
+      } )
+      tls_tunnel.listen( TLS_PORT, done )
+    }
   } )
   afterEach( function () {
     del.sync( path.join( node, '*' ) )
   } )
   after( function () {
+    tls_tunnel.close()
     del.sync( node )
   } )
 
@@ -348,6 +377,39 @@ describe( PLUGIN_NAME, function () {
               , false
               , 'sub exists'
             )
+            done()
+          }
+        }
+    )
+
+    it( 'Should https'
+      , function ( done ) {
+          var expected_path = path.join( node, MOCK )
+          var options = {
+            ca: fs.readFileSync( CA_CERT )
+          }
+          var uri = url.parse( HREF )
+          var tls = {
+            protocol: 'https:'
+            , slashes: uri.slashes
+            , auth: uri.auth
+            , port: TLS_PORT
+            , hostname: uri.hostname
+            , hash: uri.hash
+            , search: uri.search
+            , query: uri.query
+            , pathname: uri.pathname
+            , path: uri.path
+          }
+          var hrefs = url.format( tls )
+          var unit = mod( hrefs, options )
+          var mock = new Vinyl( {
+            path: path.resolve( MOCK )
+            , contents: new Buffer( MOCK )
+          } )
+          unit.write( mock, null, validate )
+          function validate() {
+            assert( fs.existsSync( expected_path ), 'file exists' )
             done()
           }
         }
