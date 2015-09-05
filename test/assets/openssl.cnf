@@ -1,0 +1,52 @@
+[ ca ]
+default_ca = CA_default
+
+[ CA_default ]
+dir          	= .
+certs	        = $dir/certs
+crl_dir	      = $dir/crl
+database      = $dir/index.txt
+new_certs_dir	= $dir/newcerts
+
+certificate	  = $dir/cacert.pem
+serial        = $dir/serial
+crlnumber     = $dir/crlnumber
+crl           = $dir/crl.pem
+private_key   = $dir/private/cakey.pem
+RANDFILE      = $dir/private/.rand
+
+unique_subject = no
+default_days = 365
+name_opt = ca_default
+cert_opt = ca_default
+copy_extensions = none
+preserve = no
+default_md = sha1
+policy = policy_match
+
+[ policy_match ]
+commonName = supplied
+emailAddress = optional
+
+[ req ]
+default_bits = 2048
+distinguished_name = req_dn
+
+[ req_dn ]
+commonName = CN
+commonName_default = localhost
+
+[ v3_ca ]
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always,issuer
+#basicConstraints = CA:true
+basicConstraints = critical, CA:true
+#basicConstraints = critical, CA:true, pathlen:0
+keyUsage = keyCertSign, cRLSign
+
+[ x509_extensions ]
+basicConstraints = CA:false
+keyUsage = digitalSignature, keyEncipherment
+extendedKeyUsage = serverAuth, clientAuth
+# issuerAltName=issuer:copy
+# subjectAltName=email:copy

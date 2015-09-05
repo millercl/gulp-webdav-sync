@@ -1,6 +1,7 @@
 var chalk = require( 'chalk' )
 var gutil = require( 'gulp-util' )
 var http = require( 'http' )
+var https = require( 'https' )
 var path = require( 'path' )
 var Stream = require( 'stream' )
 if ( !Object.assign ) {
@@ -285,13 +286,14 @@ function _colorcode_statusMessage_fn( statusMessage ) {
 }
 
 function _delete( uri, callback ) {
-  var options, req
+  var options, req, client
   options = underscore.extend(
       _options
     , url.parse( uri )
     , { method: 'DELETE' }
   )
-  req = http.request( options, callback )
+  client = _if_tls( options.protocol )
+  req = client.request( options, callback )
   req.on( 'error', _on_error )
   req.end()
 }
@@ -311,6 +313,17 @@ function _gulp_prefix() {
     .concat( Array.prototype.slice.call( arguments ) )
     .map( bracket )
     .join( ' ' )
+}
+
+function _if_tls( scheme ) {
+  switch ( scheme ) {
+    case 'http:':
+      return http
+    case 'https:':
+      return https
+    default:
+      return http
+  }
 }
 
 function _info_path( string ) {
@@ -356,13 +369,14 @@ log.var = function () {
 }
 
 function _mkcol( uri, callback ) {
-  var options, req
+  var options, req, client
   options = underscore.extend(
       _options
     , url.parse( uri )
     , { method: 'MKCOL' }
   )
-  req = http.request( options, callback )
+  client = _if_tls( options.client )
+  req = client.request( options, callback )
   req.on( 'error', _on_error )
   req.end()
 }
@@ -372,13 +386,14 @@ function _on_error( error ) {
 }
 
 function _propfind( uri, callback ) {
-  var options, req
+  var options, req, client
   options = underscore.extend(
       _options
     , url.parse( uri )
     , { method: 'PROPFIND' }
   )
-  req = http.request( options, function ( res ) {
+  client = _if_tls( options.protocol )
+  req = client.request( options, function ( res ) {
     var content = ''
     res.on( 'data', function ( chunk ) {
       content += chunk
@@ -403,13 +418,14 @@ function _proppatch( uri, props, callback ) {
 }
 
 function _put( uri, vinyl, callback ) {
-  var options, req
+  var options, req, client
   options = underscore.extend(
       _options
     , url.parse( uri )
     , { method: 'PUT' }
   )
-  req = http.request( options, callback )
+  client = _if_tls( options.protocol )
+  req = client.request( options, callback )
   vinyl.pipe( req )
   req.on( 'error', _on_error )
 }

@@ -129,7 +129,7 @@ gulp.task( 'deploy', function () {
 ## API
 
 ### webdav( [ href ] [, options ] )
-Target is a URL-type parameter whereto files are uploaded. It must specify a directory ( also known as a "collection" ). At a minimum this must be DAV root, but subdirectories may be included ( *e.g.* project name ). Part-wise definition across multiple arguments is undefined. Use the `http:` scheme, not `dav:`.
+Target is a URL-type parameter whereto files are uploaded. It must specify a directory ( also known as a "collection" ). At a minimum this must be DAV root, but subdirectories may be included ( *e.g.* project name ). Part-wise definition across multiple arguments is undefined. Use the `http:` or `https:` scheme, not `dav:`.
 
 ### webdav( [ href ] [, options ] ).clean( [ cb ] )
 Deletes all resources under `href`.
@@ -161,7 +161,7 @@ Optional, asynchronous, callback function.
 **Default:** `undefined`
 
 ## options
-Superset of [http.request options parameter](https://nodejs.org/api/http.html#http_http_request_options_callback), and [url.object](https://nodejs.org/api/url.html#url_url_format_urlobj). If any URL properties are defined, then `protocol`, `hostname`, and `pathname` are assigned to `http://localhost/`.
+Superset of [http.request options parameter](https://nodejs.org/api/http.html#http_http_request_options_callback), [https.request options parameter](https://nodejs.org/api/https.html#https_https_request_options_callback), and [url.object](https://nodejs.org/api/url.html#url_url_format_urlobj). If any URL properties are defined, then `protocol`, `hostname`, and `pathname` are assigned to `http://localhost/`.
 
 **Type:** `Object`</br>
 **Default:**
@@ -210,6 +210,9 @@ Relative or absolute path which halves the source path [`vinyl.path`] for append
 ```shell
 cd gulp-webdav-sync
 npm install
+pushd test/assets
+./rekey.sh
+popd
 npm test
 npm set dav http://user:pass@localhost:8000/
 gulp
