@@ -169,6 +169,7 @@ Superset of [http.request options parameter](https://nodejs.org/api/http.html#ht
 {
     'agent': false
   , 'clean': false
+  , 'headers': { 'User-Agent': PLUGIN_NAME + '/' + VERSION }
   , 'log': 'error'
   , 'logAuth': false
   , 'parent': process.cwd()
