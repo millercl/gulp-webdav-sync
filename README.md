@@ -162,13 +162,13 @@ Optional, asynchronous, callback function.
 
 ## options
 Superset of [http.request options parameter](https://nodejs.org/api/http.html#http_http_request_options_callback), [https.request options parameter](https://nodejs.org/api/https.html#https_https_request_options_callback), and [url.object](https://nodejs.org/api/url.html#url_url_format_urlobj). If any URL properties are defined, then `protocol`, `hostname`, and `pathname` are assigned to `http://localhost/`.
+If `options.agent` is `undefined`, then a http[s] agent will be created for the stream.
 
 **Type:** `Object`</br>
 **Default:**
 ```js
 {
-    'agent': false
-  , 'clean': false
+    'clean': false
   , 'headers': { 'User-Agent': PLUGIN_NAME + '/' + VERSION }
   , 'log': 'error'
   , 'logAuth': false

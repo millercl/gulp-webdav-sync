@@ -51,8 +51,7 @@ var _options
 module.exports = function () {
   var _string
   _options = {
-    'agent': false
-    , 'clean': false
+    'clean': false
     , 'headers': { 'User-Agent': PLUGIN_NAME + '/' + VERSION }
     , 'log': 'error'
     , 'logAuth': false
@@ -95,6 +94,12 @@ module.exports = function () {
     href = 'http://localhost/'
   }
   _info_target( href )
+  if ( _options.agent === undefined ) {
+    var agent = url.parse( href ).protocol === 'https:'
+      ? new https.Agent( _options )
+      : new http.Agent( { 'keepAlive': true } )
+    _options.agent = agent
+  }
 
   stream = new Stream.Transform( { objectMode: true } )
   stream._transform = function ( vinyl, encoding, callback ) {
