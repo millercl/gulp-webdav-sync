@@ -44,6 +44,7 @@ var url = require( 'url' )
 var xml2js = require( 'xml2js' )
 
 const PLUGIN_NAME = 'gulp-webdav-sync'
+const VERSION = require( './package.json' ).version
 var stream
 var _options
 
@@ -52,6 +53,7 @@ module.exports = function () {
   _options = {
     'agent': false
     , 'clean': false
+    , 'headers': { 'User-Agent': PLUGIN_NAME + '/' + VERSION }
     , 'log': 'error'
     , 'logAuth': false
     , 'parent': process.cwd()
