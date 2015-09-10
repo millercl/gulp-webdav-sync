@@ -35,11 +35,6 @@ if ( !Object.assign ) {
     , writable: true
   } )
 }
-var underscore = {
-  extend: function () {
-    return Object.assign.apply( null, arguments )
-  }
-}
 var url = require( 'url' )
 var xml2js = require( 'xml2js' )
 
@@ -62,7 +57,7 @@ module.exports = function () {
       _string = arguments[i]
     }
     if ( typeof arguments[i] === 'object' && arguments[i] ) {
-      _options = underscore.extend( _options, arguments[i] )
+      Object.assign( _options, arguments[i] )
     }
   }
   if ( _options ) {
@@ -206,7 +201,7 @@ module.exports = function () {
     }
   }
   stream.clean = function ( callback ) {
-    _options = underscore.extend( _options, { 'headers': { 'Depth': 1 } } )
+    Object.assign( _options, { 'headers': { 'Depth': 1 } } )
     _propfind( href, function ( dom ) {
       var url_paths = _xml_to_url_a( dom )
       url_paths = url_paths.map(
@@ -294,8 +289,9 @@ function _colorcode_statusMessage_fn( statusMessage ) {
 
 function _delete( uri, callback ) {
   var options, req, client
-  options = underscore.extend(
-      _options
+  options = Object.assign(
+      {}
+    , _options
     , url.parse( uri )
     , { method: 'DELETE' }
   )
@@ -377,8 +373,9 @@ log.var = function () {
 
 function _mkcol( uri, callback ) {
   var options, req, client
-  options = underscore.extend(
-      _options
+  options = Object.assign(
+      {}
+    , _options
     , url.parse( uri )
     , { method: 'MKCOL' }
   )
@@ -394,8 +391,9 @@ function _on_error( error ) {
 
 function _propfind( uri, callback ) {
   var options, req, client
-  options = underscore.extend(
-      _options
+  options = Object.assign(
+      {}
+    , _options
     , url.parse( uri )
     , { method: 'PROPFIND' }
   )
@@ -426,8 +424,9 @@ function _proppatch( uri, props, callback ) {
 
 function _put( uri, vinyl, callback ) {
   var options, req, client
-  options = underscore.extend(
-      _options
+  options = Object.assign(
+      {}
+    , _options
     , url.parse( uri )
     , { method: 'PUT' }
   )
