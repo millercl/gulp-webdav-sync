@@ -485,13 +485,40 @@ function _strip_url_auth( href ) {
 }
 
 function _xml_to_url_a( dom ) {
-  var relative_urls = []
+  function href( element ) {
+    return element.href
+  }
+  return _xml_parse( dom ).map( href )
+}
+
+function _xml_parse( dom ) {
+  var array = []
   try {
     dom.multistatus.response.forEach( function ( response ) {
-      relative_urls.push( response.href[0] )
+      var href = response.href[0]
+      var propstat = response.propstat[0]
+      var prop = response.propstat[0].prop[0]
+      var getlastmodified = response.propstat[0].prop[0].getlastmodified[0]
+      var stat = response.propstat[0].status[0]
+      var resource = {}
+      resource.href = href
+      if ( propstat ) {
+        if ( prop ) {
+          if ( getlastmodified ) {
+            resource.getlastmodified = new Date( getlastmodified._ )
+          }
+        }
+        if ( stat ) {
+          resource.stat = http_status_to_int( stat )
+        }
+      }
+      array.push( resource )
     } )
   } catch ( error ) {
     throw error
   }
-  return relative_urls
+  return array
+  function http_status_to_int( string ) {
+    return Number( /\d{3}/.exec( string ) )
+  }
 }
