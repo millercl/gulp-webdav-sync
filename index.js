@@ -201,8 +201,7 @@ module.exports = function () {
     }
   }
   stream.clean = function ( callback ) {
-    Object.assign( _options, { 'headers': { 'Depth': 1 } } )
-    _propfind( href, function ( dom ) {
+    _propfind( href, 1, function ( dom ) {
       var url_paths = _xml_to_url_a( dom )
       url_paths = url_paths.map(
         function ( url_path ) {
@@ -389,13 +388,14 @@ function _on_error( error ) {
   stream.emit( 'error', error )
 }
 
-function _propfind( uri, callback ) {
+function _propfind( uri, depth, callback ) {
   var options, req, client
   options = Object.assign(
       {}
     , _options
     , url.parse( uri )
     , { method: 'PROPFIND' }
+    , { 'headers': { 'Depth': depth } }
   )
   client = _if_tls( options.protocol )
   req = client.request( options, function ( res ) {
