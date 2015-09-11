@@ -220,6 +220,11 @@ describe( PLUGIN_NAME, function () {
           unit.write( mock, null, validate )
           function validate() {
             assert( fs.existsSync( expected_path ), 'file exists' )
+            assert.equal(
+                fs.readFileSync( expected_path ).toString()
+              , MOCK
+              , 'file contents'
+            )
             done()
           }
         }
@@ -237,6 +242,11 @@ describe( PLUGIN_NAME, function () {
           unit.write( mock, null, validate )
           function validate() {
             assert( fs.existsSync( expected_path ), 'file exists' )
+            assert.equal(
+                fs.readFileSync( expected_path ).toString()
+              , MOCK
+              , 'file contents'
+            )
             done()
           }
         }
@@ -255,6 +265,11 @@ describe( PLUGIN_NAME, function () {
           unit.write( mock, null, validate )
           function validate() {
             assert( fs.existsSync( expected_path ), 'file exists' )
+            assert.equal(
+                fs.readFileSync( expected_path ).toString()
+              , MOCK
+              , 'file contents'
+            )
             done()
           }
         }
@@ -276,6 +291,11 @@ describe( PLUGIN_NAME, function () {
           unit.write( mock, null, validate )
           function validate() {
             assert( fs.existsSync( expected_path ), 'file exists' )
+            assert.equal(
+                fs.readFileSync( expected_path ).toString()
+              , MOCK
+              , 'file contents'
+            )
             done()
           }
         }
@@ -410,6 +430,11 @@ describe( PLUGIN_NAME, function () {
           unit.write( mock, null, validate )
           function validate() {
             assert( fs.existsSync( expected_path ), 'file exists' )
+            assert.equal(
+                fs.readFileSync( expected_path ).toString()
+              , MOCK
+              , 'file contents'
+            )
             done()
           }
         }
