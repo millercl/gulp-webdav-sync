@@ -1,13 +1,13 @@
 var assert = require( 'assert' )
 var dav = require( 'jsDAV' )
 var del = require( 'del' )
-var es = require( 'event-stream' )
 var fs = require( 'fs' )
 var mod = require( '../index' )
 var net = require( 'net' )
 var npmconf = require( 'npmconf' )
 var os = require( 'os' )
 var path = require( 'path' )
+var stream = require( 'stream' )
 var tls = require( 'tls' )
 var url = require( 'url' )
 var Vinyl = require( 'vinyl' )
@@ -233,12 +233,17 @@ describe( PLUGIN_NAME, function () {
     it( 'Should create a file on the server when vinyl.isStream()'
       , function ( done ) {
           var expected_path = path.join( node, MOCK )
+          var contents = new stream.Readable()
+          contents.push( MOCK )
+          contents.push( null )
           var mock = new Vinyl( {
             path: path.resolve( MOCK )
-            , contents: es.readArray( [ MOCK ] )
+            , contents: contents
           } )
           assert( mock.isStream(), 'vinyl.isStream()' )
-          var unit = mod( HREF )
+          var options = {
+          }
+          var unit = mod( HREF, options )
           unit.write( mock, null, validate )
           function validate() {
             assert( fs.existsSync( expected_path ), 'file exists' )
