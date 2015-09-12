@@ -286,12 +286,12 @@ function _colorcode_statusMessage_fn( statusMessage ) {
   }
 }
 
-function _delete( uri, callback ) {
+function _delete( href, callback ) {
   var options, req, client
   options = Object.assign(
       {}
     , _options
-    , url.parse( uri )
+    , url.parse( href )
     , { method: 'DELETE' }
   )
   client = _if_tls( options.protocol )
@@ -300,7 +300,7 @@ function _delete( uri, callback ) {
   req.end()
 }
 
-function _get( uri, vinyl, callback ) {
+function _get( href, vinyl, callback ) {
 }
 
 function _gulp_prefix() {
@@ -343,11 +343,11 @@ function _info_status( statusCode ) {
   log.info( '  ', code, msg )
 }
 
-function _info_target( uri ) {
+function _info_target( href ) {
   if ( _options.logAuth !== true ) {
-    uri = _strip_url_auth( uri )
+    href = _strip_url_auth( href )
   }
-  var to = chalk.blue( uri )
+  var to = chalk.blue( href )
   log.info( _gulp_prefix(), to )
 }
 
@@ -370,12 +370,12 @@ log.var = function () {
   log.log( _gulp_prefix( 'log' ), chalk.grey( args.join( ' ' ) ), last )
 }
 
-function _mkcol( uri, callback ) {
+function _mkcol( href, callback ) {
   var options, req, client
   options = Object.assign(
       {}
     , _options
-    , url.parse( uri )
+    , url.parse( href )
     , { method: 'MKCOL' }
   )
   client = _if_tls( options.client )
@@ -388,12 +388,12 @@ function _on_error( error ) {
   stream.emit( 'error', error )
 }
 
-function _propfind( uri, depth, callback ) {
+function _propfind( href, depth, callback ) {
   var options, req, client
   options = Object.assign(
       {}
     , _options
-    , url.parse( uri )
+    , url.parse( href )
     , { method: 'PROPFIND' }
     , { 'headers': { 'Depth': depth } }
   )
@@ -419,15 +419,15 @@ function _propfind( uri, depth, callback ) {
   req.end()
 }
 
-function _proppatch( uri, props, callback ) {
+function _proppatch( href, props, callback ) {
 }
 
-function _put( uri, vinyl, callback ) {
+function _put( href, vinyl, callback ) {
   var options, req, client
   options = Object.assign(
       {}
     , _options
-    , url.parse( uri )
+    , url.parse( href )
     , { method: 'PUT' }
   )
   client = _if_tls( options.protocol )
