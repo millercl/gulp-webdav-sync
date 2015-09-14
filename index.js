@@ -452,6 +452,38 @@ function _propfind( href, depth, callback ) {
 }
 
 function _proppatch( href, props, callback ) {
+  var options, xml, req
+  options = Object.assign(
+      {}
+    , _options
+    , url.parse( href )
+    , { method: 'PROPPATCH' }
+    , { headers: { 'Content-Type': 'text/xml; charset="utf-8"' } }
+  )
+  xml = ( new xml2js.Builder() ).buildObject( props )
+  req = http.request( options, callback )
+  req.on( 'error', _on_error )
+  req.write( xml )
+  req.end()
+}
+
+function _proppatch_( href, date, cb ) {
+  var dom = {
+    'd:propertyupdate': {
+      $: {
+        'xmlns:d': 'DAV:'
+      }
+      , 'd:set': {
+          'd:prop': {
+            'd:creationdate': date.toJSON()
+            , 'd:resourcetype': { 'd:collection': null }
+          }
+        }
+    }
+  }
+  _proppatch( href, dom, function ( res ) {
+    cb( res )
+  } )
 }
 
 function _put( href, vinyl, callback ) {
