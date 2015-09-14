@@ -105,8 +105,8 @@ module.exports = function () {
     }
     var target_url
     var target_stem
+    var target_propfind
     try {
-      log.var( '$href', href )
       target_url = _splice_target(
           vinyl.path
         , path.resolve( _options.parent )
@@ -122,14 +122,37 @@ module.exports = function () {
       callback( null, vinyl )
       return
     }
-    init()
+    log.var( '$target_url', target_url )
+    _propfind( target_url, 0, function ( res, dom ) {
+      if ( res.statusCode === 207 ) {
+        target_propfind = _xml_parse( dom )[0]
+        log.var( '$target_propfind', '' )
+        log.var( ' .getlastmodified', target_propfind.getlastmodified )
+        log.var( ' .stat', target_propfind.stat )
+      }
+      init()
+    } )
 
     function init() {
+      function eq_target_stem( element ) {
+        return url.resolve( href, element ) === target_url
+      }
+      function eq_target_stem_col( element ) {
+        return url.resolve( href, element ) === target_url + '/'
+      }
+      function is_target( element, operator ) {
+        if ( operator( url.resolve( href, element.href ) ) ) {
+          return true
+        } else {
+          return false
+        }
+      }
+      var list = target_propfind ? [ target_propfind ] : []
+      var path_
       if ( target_url === href ) {
         callback()
         return
       }
-      log.var( '$target_url', target_url )
       _info_path( target_stem )
       if ( vinyl.event === 'unlink' ) {
         _delete( target_url, resume )
@@ -150,7 +173,16 @@ module.exports = function () {
             , vinyl.path + ' is not a directory.'
           )
         }
-        _mkcol( target_url, resume )
+        path_ = list.filter(
+            function ( element ) {
+              return is_target( element, eq_target_stem_col )
+            }
+        )
+        if ( path_.length === 1 ) {
+          resume( { statusCode: path_[0].stat } )
+        } else {
+          _mkcol( target_url, resume )
+        }
         return
       }
       if ( vinyl.isStream() ) {
@@ -201,7 +233,7 @@ module.exports = function () {
     }
   }
   stream.clean = function ( callback ) {
-    _propfind( href, 1, function ( dom ) {
+    _propfind( href, 1, function ( res, dom ) {
       var url_paths = _xml_to_url_a( dom )
       url_paths = url_paths.map(
         function ( url_path ) {
@@ -411,7 +443,7 @@ function _propfind( href, depth, callback ) {
         if ( err ) {
           _on_error( err )
         }
-        callback( result )
+        callback( res, result )
       } )
     } )
   } )
@@ -456,7 +488,7 @@ function _splice_target( vinyl_path, parent_dir, href ) {
   if ( !href ) {
     href = ''
   }
-  return href + target_stem
+  return url.resolve( href, target_stem )
 }
 
 function _splice_target_stem( vinyl_path, parent_dir, href ) {
@@ -515,7 +547,7 @@ function _xml_parse( dom ) {
       array.push( resource )
     } )
   } catch ( error ) {
-    throw error
+    _on_error( error )
   }
   return array
   function http_status_to_int( string ) {

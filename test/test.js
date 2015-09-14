@@ -199,7 +199,30 @@ describe( PLUGIN_NAME, function () {
             path: path.resolve( MOCK )
           } )
           assert( mock.isNull(), 'vinyl.isNull()' )
-          var unit = mod( HREF )
+          var options = {
+          }
+          var unit = mod( HREF, options )
+          unit.write( mock, null, validate )
+          function validate() {
+            assert( fs.existsSync( expected_path ), 'directory exists' )
+            done()
+          }
+        }
+    )
+
+    it( 'Should not create a directory when vinyl.isNull() and status 200 OK'
+      , function ( done ) {
+          var expected_path = path.join( node, MOCK )
+          var expected_dir = path.join( node, MOCK )
+          fs.mkdirSync( expected_dir )
+          assert( fs.existsSync( expected_dir ), 'dir exists' )
+          var mock = new Vinyl( {
+            path: path.resolve( MOCK )
+          } )
+          assert( mock.isNull(), 'vinyl.isNull()' )
+          var options = {
+          }
+          var unit = mod( HREF, options )
           unit.write( mock, null, validate )
           function validate() {
             assert( fs.existsSync( expected_path ), 'directory exists' )
