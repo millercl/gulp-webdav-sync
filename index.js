@@ -437,7 +437,8 @@ function _propfind( href, depth, callback ) {
     } )
     res.on( 'end', function () {
       var opt = {
-        tagNameProcessors: [ xml2js.processors.stripPrefix ]
+        explicitCharkey: true
+        , tagNameProcessors: [ xml2js.processors.stripPrefix ]
       }
       xml2js.parseString( content, opt, function ( err, result ) {
         if ( err ) {
@@ -565,7 +566,7 @@ function _xml_parse( dom ) {
       var getlastmodified = response.propstat[0].prop[0].getlastmodified[0]
       var stat = response.propstat[0].status[0]
       var resource = {}
-      resource.href = href
+      resource.href = href._
       if ( propstat ) {
         if ( prop ) {
           if ( getlastmodified ) {
@@ -573,7 +574,7 @@ function _xml_parse( dom ) {
           }
         }
         if ( stat ) {
-          resource.stat = http_status_to_int( stat )
+          resource.stat = http_status_to_int( stat._ )
         }
       }
       array.push( resource )
