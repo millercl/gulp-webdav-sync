@@ -127,8 +127,15 @@ module.exports = function () {
       if ( res.statusCode === 207 ) {
         target_propfind = _xml_parse( dom )[0]
         log.var( '$target_propfind', '' )
+        log.var( ' .getcontentlength', target_propfind.getcontentlength )
         log.var( ' .getlastmodified', target_propfind.getlastmodified )
         log.var( ' .stat', target_propfind.stat )
+      } else {
+        log.warn(
+            _gulp_prefix( 'warn' )
+          , _colorcode_statusCode_fn( res.statusCode )
+          , 'PROPFIND ' + target_url
+        )
       }
       init()
     } )
@@ -557,9 +564,8 @@ function _xml_to_url_a( dom ) {
 }
 
 function _xml_parse( dom ) {
-  var array = []
   try {
-    dom.multistatus.response.forEach( function ( response ) {
+    return dom.multistatus.response.map( function ( response ) {
       var href = response.href[0]
       var propstat = response.propstat[0]
       var prop = response.propstat[0].prop[0]
@@ -569,6 +575,10 @@ function _xml_parse( dom ) {
       resource.href = href._
       if ( propstat ) {
         if ( prop ) {
+          var getcontentlength = response.propstat[0].prop[0].getcontentlength
+          if ( getcontentlength ) {
+            resource.getcontentlength = getcontentlength[0]._
+          }
           if ( getlastmodified ) {
             resource.getlastmodified = new Date( getlastmodified._ )
           }
@@ -577,12 +587,12 @@ function _xml_parse( dom ) {
           resource.stat = http_status_to_int( stat._ )
         }
       }
-      array.push( resource )
+      return resource
     } )
   } catch ( error ) {
     _on_error( error )
   }
-  return array
+  return []
   function http_status_to_int( string ) {
     return Number( /\d{3}/.exec( string ) )
   }
