@@ -130,12 +130,7 @@ module.exports = function () {
         log.var( ' .getcontentlength', target_propfind.getcontentlength )
         log.var( ' .getlastmodified', target_propfind.getlastmodified )
         log.var( ' .stat', target_propfind.stat )
-      } else {
-        log.warn(
-            _gulp_prefix( 'warn' )
-          , _colorcode_statusCode_fn( res.statusCode )
-          , 'PROPFIND ' + target_url
-        )
+        log.var( ' .resourcetype', target_propfind.resourcetype )
       }
       init()
     } )
@@ -581,6 +576,15 @@ function _xml_parse( dom ) {
           }
           if ( getlastmodified ) {
             resource.getlastmodified = new Date( getlastmodified._ )
+          }
+          var resourcetype = response.propstat[0].prop[0].resourcetype
+          if ( resourcetype ) {
+            if ( typeof resourcetype[0] === 'string' ) {
+              resource.resourcetype = null
+            } else
+            if ( typeof resourcetype[0] === 'object' ) {
+              resource.resourcetype = Object.keys( resourcetype[0] )[0]
+            }
           }
         }
         if ( stat ) {
