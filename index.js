@@ -122,7 +122,7 @@ module.exports = function () {
       callback( null, vinyl )
       return
     }
-    log.var( '$target_url', target_url )
+    log.var( '$target_url', _strip_url_auth( target_url ) )
     _propfind( target_url, 0, function ( res, dom ) {
       if ( res.statusCode === 207 ) {
         target_propfind = _xml_parse( dom )[0]
