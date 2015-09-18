@@ -45,6 +45,7 @@ var _options
 
 module.exports = function () {
   var _string
+  var codes = []
   _options = {
     'clean': false
     , 'headers': { 'User-Agent': PLUGIN_NAME + '/' + VERSION }
@@ -198,6 +199,9 @@ module.exports = function () {
 
     function resume( res ) {
       if ( res ) {
+        if ( codes.indexOf( res.statusCode ) === -1 ) {
+          codes.push( res.statusCode )
+        }
         _info_status( res.statusCode, target_stem )
       }
       callback()
@@ -224,6 +228,9 @@ module.exports = function () {
           , href
       )
       _delete( target_url, function ( res ) {
+        if ( codes.indexOf( res.statusCode ) === -1 ) {
+          codes.push( res.statusCode )
+        }
         _info_status( res.statusCode, target_stem )
         if ( callback && typeof callback === 'function' ) {
           callback()
@@ -248,6 +255,9 @@ module.exports = function () {
           var element = url_paths.pop()
           _delete( url.resolve( href, element )
             , function ( res ) {
+                if ( codes.indexOf( res.statusCode ) === -1 ) {
+                  codes.push( res.statusCode )
+                }
                 _info_status( res.statusCode, element )
                 recursive_delete( url_paths )
               }
@@ -261,6 +271,14 @@ module.exports = function () {
       recursive_delete( url_paths )
     } )
   }
+  stream.on( 'finish', function () {
+    codes = codes.filter( function ( code ) {
+      return !( code === 200 || code === 404 )
+    } )
+    codes.sort().forEach( function ( element ) {
+      _info_code( element )
+    } )
+  } )
   return stream
 }
 
