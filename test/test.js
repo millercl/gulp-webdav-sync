@@ -78,9 +78,11 @@ describe( PLUGIN_NAME, function () {
           } )
           var uri = url.parse( HREF )
           uri.protocol = 'dav:'
+          var unit = mod( uri.format() )
           assert.throws(
               function () {
-                mod( uri.format() ).write( mock, null, validate )
+                unit.write( mock, null, validate )
+                unit.end()
               }
             , /not supported/
           )
@@ -126,6 +128,7 @@ describe( PLUGIN_NAME, function () {
             validate()
           } )
           unit.write( mock, null, null )
+          unit.end()
           function validate() {
             assert.equal(
                 fs.existsSync( expected_path )
@@ -153,6 +156,7 @@ describe( PLUGIN_NAME, function () {
             validate()
           } )
           unit.write( mock, null, null )
+          unit.end()
           function validate() {
             assert.equal(
                 fs.existsSync( expected_path )
@@ -181,6 +185,7 @@ describe( PLUGIN_NAME, function () {
             validate()
           } )
           unit.write( mock, null, null )
+          unit.end()
           function validate() {
             assert.equal(
                 fs.existsSync( expected_path )
@@ -203,6 +208,7 @@ describe( PLUGIN_NAME, function () {
           }
           var unit = mod( HREF, options )
           unit.write( mock, null, validate )
+          unit.end()
           function validate() {
             assert( fs.existsSync( expected_path ), 'directory exists' )
             done()
@@ -224,6 +230,7 @@ describe( PLUGIN_NAME, function () {
           }
           var unit = mod( HREF, options )
           unit.write( mock, null, validate )
+          unit.end()
           function validate() {
             assert( fs.existsSync( expected_path ), 'directory exists' )
             done()
@@ -241,6 +248,7 @@ describe( PLUGIN_NAME, function () {
           assert( mock.isBuffer(), 'vinyl.isBuffer()' )
           var unit = mod( HREF )
           unit.write( mock, null, validate )
+          unit.end()
           function validate() {
             assert( fs.existsSync( expected_path ), 'file exists' )
             assert.equal(
@@ -268,6 +276,7 @@ describe( PLUGIN_NAME, function () {
           }
           var unit = mod( HREF, options )
           unit.write( mock, null, validate )
+          unit.end()
           function validate() {
             assert( fs.existsSync( expected_path ), 'file exists' )
             assert.equal(
@@ -291,6 +300,7 @@ describe( PLUGIN_NAME, function () {
           var uri = url.parse( HREF )
           var unit = mod( uri )
           unit.write( mock, null, validate )
+          unit.end()
           function validate() {
             assert( fs.existsSync( expected_path ), 'file exists' )
             assert.equal(
@@ -317,6 +327,7 @@ describe( PLUGIN_NAME, function () {
           }
           var unit = mod( bon )
           unit.write( mock, null, validate )
+          unit.end()
           function validate() {
             assert( fs.existsSync( expected_path ), 'file exists' )
             assert.equal(
@@ -345,6 +356,7 @@ describe( PLUGIN_NAME, function () {
           } )
           mock.event = 'unlink'
           unit.write( mock, null, validate )
+          unit.end()
           function validate() {
             assert.equal(
                 fs.existsSync( expected_path )
@@ -371,6 +383,7 @@ describe( PLUGIN_NAME, function () {
           } )
           mock.event = 'unlink'
           unit.write( mock, null, validate )
+          unit.end()
           function validate() {
             assert.equal(
                 fs.existsSync( expected_path )
@@ -410,6 +423,7 @@ describe( PLUGIN_NAME, function () {
             } )
           } )
           function validate() {
+            unit.end()
             assert.equal(
                 fs.existsSync( expected_file )
               , false
@@ -456,6 +470,7 @@ describe( PLUGIN_NAME, function () {
             , contents: new Buffer( MOCK )
           } )
           unit.write( mock, null, validate )
+          unit.end()
           function validate() {
             assert( fs.existsSync( expected_path ), 'file exists' )
             assert.equal(
