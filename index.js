@@ -289,8 +289,9 @@ function _colorcode_statusCode_fn( statusCode ) {
     case 200:
       return chalk.bgWhite.black
     case 201:
-    case 204:
       return chalk.bgGreen.white
+    case 204:
+      return chalk.bgYellow.white
     case 207:
       return chalk.bgWhite.black
     case 403:
@@ -317,8 +318,9 @@ function _colorcode_statusMessage_fn( statusMessage ) {
     case 200:
       return chalk.white
     case 201:
-    case 204:
       return chalk.green
+    case 204:
+      return chalk.yellow
     case 207:
       return chalk.white
     case 403:
