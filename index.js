@@ -155,12 +155,13 @@ module.exports = function () {
         callback()
         return
       }
-      _info_path( target_stem )
       if ( vinyl.event === 'unlink' ) {
+        target_stem += '/'
         _delete( target_url, resume )
         return
       }
       if ( _options.clean ) {
+        target_stem += '/'
         _delete( target_url, resume )
         return
       }
@@ -169,6 +170,7 @@ module.exports = function () {
         return
       }
       if ( vinyl.isNull() ) {
+        target_stem += '/'
         if ( vinyl.stat && !vinyl.stat.isDirectory() ) {
           log.warn(
               _gulp_prefix( 'warn' )
@@ -196,7 +198,7 @@ module.exports = function () {
 
     function resume( res ) {
       if ( res ) {
-        _info_status( res.statusCode )
+        _info_status( res.statusCode, target_stem )
       }
       callback()
     }
@@ -221,9 +223,8 @@ module.exports = function () {
           , path.resolve( _options.parent )
           , href
       )
-      _info_path( target_stem )
       _delete( target_url, function ( res ) {
-        _info_status( res.statusCode )
+        _info_status( res.statusCode, target_stem )
         if ( callback && typeof callback === 'function' ) {
           callback()
         }
@@ -237,20 +238,17 @@ module.exports = function () {
   stream.clean = function ( callback ) {
     _propfind( href, 1, function ( res, dom ) {
       var url_paths = _xml_to_url_a( dom )
-      url_paths = url_paths.map(
+      url_paths = url_paths.filter(
         function ( url_path ) {
-          return url.resolve( href, url_path )
-        }
-      ).filter(
-        function ( url_path ) {
-          return url_path !== href
+          return url.resolve( href, url_path ) !== href
         }
       )
       function recursive_delete( url_paths ) {
         if ( url_paths.length > 0 ) {
-          _delete( url_paths.pop()
+          var element = url_paths.pop()
+          _delete( url.resolve( href, element )
             , function ( res ) {
-                _info_status( res.statusCode )
+                _info_status( res.statusCode, element )
                 recursive_delete( url_paths )
               }
           )
@@ -362,19 +360,21 @@ function _if_tls( scheme ) {
   }
 }
 
-function _info_path( string ) {
-  var out = string
-  log.info( _gulp_prefix(), out )
+function _info_status( statusCode, string ) {
+  var code =
+    _colorcode_statusCode_fn( statusCode )
+      .call( this, statusCode )
+  log.info( _gulp_prefix(), code, string )
 }
 
-function _info_status( statusCode ) {
+function _info_code( statusCode ) {
   var code =
     _colorcode_statusCode_fn( statusCode )
       .call( this, statusCode )
   var msg =
     _colorcode_statusMessage_fn( statusCode )
       .call( this, http.STATUS_CODES[statusCode] )
-  log.info( '  ', code, msg )
+  log.info( _gulp_prefix(), code, msg )
 }
 
 function _info_target( href ) {
