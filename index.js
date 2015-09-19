@@ -156,13 +156,7 @@ module.exports = function () {
         callback()
         return
       }
-      if ( vinyl.event === 'unlink' ) {
-        target_stem += '/'
-        _delete( target_url, resume )
-        return
-      }
-      if ( _options.clean ) {
-        target_stem += '/'
+      if ( vinyl.event === 'unlink'  || _options.clean ) {
         _delete( target_url, resume )
         return
       }
