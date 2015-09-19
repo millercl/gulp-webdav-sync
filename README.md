@@ -173,6 +173,7 @@ If `options.agent` is `undefined`, then a http[s] agent will be created for the 
   , 'log': 'error'
   , 'logAuth': false
   , 'parent': process.cwd()
+  , 'uselastmodified': 1000
 }
 ```
 
@@ -206,6 +207,15 @@ Relative or absolute path which halves the source path [`vinyl.path`] for append
 
 **Type:** `String`</br>
 **Default:** `process.cwd()`
+
+### options.uselastmodified
+Compare remote `getlastmodified` versus local ( changed ) `ctime`.
+Only `PUT` if `ctime` is newer than `getlastmodified`.
+Numeric value in milliseconds is the tolerance interval for qualifying client-server synchronization.
+Set to false to disable.
+
+**Type:** `Number`</br>
+**Default:** `1000` ms
 
 ## Development
 ```shell
