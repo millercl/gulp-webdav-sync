@@ -52,6 +52,7 @@ module.exports = function () {
     , 'log': 'error'
     , 'logAuth': false
     , 'parent': process.cwd()
+    , 'uselastmodified': 1000
   }
   for ( var i in arguments ) {
     if ( typeof arguments[i] === 'string' ) {
@@ -106,7 +107,8 @@ module.exports = function () {
     }
     var target_url
     var target_stem
-    var target_propfind
+    var target_propfind = {}
+    var server_date
     try {
       target_url = _splice_target(
           vinyl.path
@@ -133,10 +135,40 @@ module.exports = function () {
         log.var( ' .stat', target_propfind.stat )
         log.var( ' .resourcetype', target_propfind.resourcetype )
       }
+      if ( res.headers.date ) {
+        server_date = new Date( res.headers.date )
+      }
       init()
     } )
 
     function init() {
+      function times_are_comparable() {
+        return target_propfind.getlastmodified && vinyl.stat && vinyl.stat.ctime
+      }
+      function server_is_synchronized() {
+        var now = new Date()
+        var tolerance = _options.uselastmodified
+        var interval_end = new Date( server_date.getTime() + tolerance )
+        var within_interval = interval_end.getTime() > now.getTime()
+        log.var( '$server_date', server_date.getTime() )
+        log.var( '$now        ', now.getTime() )
+        log.var( '$within_interval', within_interval )
+        return within_interval
+      }
+      function ctime_is_newer() {
+        var tolerance = _options.uselastmodified
+        var ctime = vinyl.stat
+          ? vinyl.stat.ctime.getTime()
+          : null
+        var lastmodified = target_propfind.getlastmodified
+          ? target_propfind.getlastmodified.getTime()
+          : null
+        var newer = ctime > lastmodified
+        log.var( '$ctime', ctime )
+        log.var( '$lastmodified', lastmodified )
+        log.var( '$newer', newer )
+        return newer
+      }
       function eq_target_stem( element ) {
         return url.resolve( href, element ) === target_url
       }
@@ -144,6 +176,9 @@ module.exports = function () {
         return url.resolve( href, element ) === target_url + '/'
       }
       function is_target( element, operator ) {
+        if ( !element.href ) {
+          return false
+        }
         if ( operator( url.resolve( href, element.href ) ) ) {
           return true
         } else {
@@ -158,10 +193,6 @@ module.exports = function () {
       }
       if ( vinyl.event === 'unlink'  || _options.clean ) {
         _delete( target_url, resume )
-        return
-      }
-      if ( vinyl.isBuffer() ) {
-        _put( target_url, vinyl, resume )
         return
       }
       if ( vinyl.isNull() ) {
@@ -184,9 +215,19 @@ module.exports = function () {
         }
         return
       }
-      if ( vinyl.isStream() ) {
-        _put( target_url, vinyl, resume )
-        return
+      if ( vinyl.isBuffer() || vinyl.isStream() ) {
+        if ( _options.uselastmodified && times_are_comparable() ) {
+          if ( server_is_synchronized() && ctime_is_newer() ) {
+            _put( target_url, vinyl, resume )
+            return
+          } else {
+            resume( { statusCode: target_propfind.stat } )
+            return
+          }
+        } else {
+          _put( target_url, vinyl, resume )
+          return
+        }
       }
       callback( null, vinyl )
     }

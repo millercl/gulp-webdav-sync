@@ -244,6 +244,7 @@ describe( PLUGIN_NAME, function () {
           var mock = new Vinyl( {
             path: path.resolve( MOCK )
             , contents: new Buffer( MOCK )
+            , stat: { ctime: new Date() }
           } )
           assert( mock.isBuffer(), 'vinyl.isBuffer()' )
           var unit = mod( HREF )
@@ -270,6 +271,7 @@ describe( PLUGIN_NAME, function () {
           var mock = new Vinyl( {
             path: path.resolve( MOCK )
             , contents: contents
+            , stat: { ctime: new Date() }
           } )
           assert( mock.isStream(), 'vinyl.isStream()' )
           var options = {
@@ -295,6 +297,7 @@ describe( PLUGIN_NAME, function () {
           var mock = new Vinyl( {
             path: path.resolve( MOCK )
             , contents: new Buffer( MOCK )
+            , stat: { ctime: new Date() }
           } )
           assert( mock.isBuffer(), 'vinyl.isBuffer()' )
           var uri = url.parse( HREF )
@@ -319,6 +322,7 @@ describe( PLUGIN_NAME, function () {
           var mock = new Vinyl( {
             path: path.resolve( MOCK )
             , contents: new Buffer( MOCK )
+            , stat: { ctime: new Date() }
           } )
           assert( mock.isBuffer(), 'vinyl.isBuffer()' )
           var uri = url.parse( HREF )
@@ -468,6 +472,7 @@ describe( PLUGIN_NAME, function () {
           var mock = new Vinyl( {
             path: path.resolve( MOCK )
             , contents: new Buffer( MOCK )
+            , stat: { ctime: new Date() }
           } )
           unit.write( mock, null, validate )
           unit.end()
