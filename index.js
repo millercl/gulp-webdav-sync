@@ -129,7 +129,7 @@ module.exports = function () {
     _propfind( target_url, 0, function ( res, dom ) {
       if ( res.statusCode === 207 ) {
         target_propfind = _xml_parse( dom )[0]
-        log.var( '$target_propfind', '' )
+        log.var( '$target_propfind' )
         log.var( ' .getcontentlength', target_propfind.getcontentlength )
         log.var( ' .getlastmodified', target_propfind.getlastmodified )
         log.var( ' .stat', target_propfind.stat )
@@ -457,7 +457,7 @@ var log = ( function () {
 
 log.var = function () {
   var args = Array.prototype.slice.call( arguments )
-  var last = args.pop()
+  var last = args.length > 1 ? args.pop() : ''
   log.log( _gulp_prefix( 'log' ), chalk.grey( args.join( ' ' ) ), last )
 }
 
