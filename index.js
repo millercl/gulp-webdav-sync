@@ -97,6 +97,19 @@ module.exports = function () {
       : new http.Agent( { 'keepAlive': true } )
     _options.agent = agent
   }
+  function filter_on_href( list, urlpath ) {
+    return list
+      .filter( function ( element ) {
+        if ( element.href ) {
+          var w_slash = url.resolve( href, element.href ) === urlpath + '/'
+          var wo_slash = url.resolve( href, element.href ) === urlpath
+          if ( w_slash || wo_slash ) {
+            return true
+          }
+        }
+        return false
+      } )
+  }
 
   stream = new Stream.Transform( { objectMode: true } )
   stream._transform = function ( vinyl, encoding, callback ) {
@@ -169,22 +182,6 @@ module.exports = function () {
         log.var( '$newer', newer )
         return newer
       }
-      function eq_target_stem( element ) {
-        return url.resolve( href, element ) === target_url
-      }
-      function eq_target_stem_col( element ) {
-        return url.resolve( href, element ) === target_url + '/'
-      }
-      function is_target( element, operator ) {
-        if ( !element.href ) {
-          return false
-        }
-        if ( operator( url.resolve( href, element.href ) ) ) {
-          return true
-        } else {
-          return false
-        }
-      }
       var list = target_propfind ? [ target_propfind ] : []
       var path_
       if ( target_url === href ) {
@@ -203,11 +200,7 @@ module.exports = function () {
             , vinyl.path + ' is not a directory.'
           )
         }
-        path_ = list.filter(
-            function ( element ) {
-              return is_target( element, eq_target_stem_col )
-            }
-        )
+        path_ = filter_on_href( list, target_url )
         if ( path_.length === 1 ) {
           resume( { statusCode: path_[0].stat } )
         } else {
