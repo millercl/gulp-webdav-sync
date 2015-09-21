@@ -11,7 +11,6 @@ gulp.task( 'default', [ 'int-test' ] )
 
 gulp.task( 'int-test', [ '.npmrc' ], function () {
   return gulp.src( 'test/assets/**' )
-    .pipe( debug( { title: 'pre' } ) )
     .pipe( dav( href, { 'log': 'info', 'parent': 'test/assets' } ) )
     .pipe( debug( { title: 'post' } ) )
 } )
