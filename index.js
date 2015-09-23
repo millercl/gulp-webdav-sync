@@ -382,7 +382,17 @@ function _delete( href, callback ) {
   req.end()
 }
 
-function _get( href, vinyl, callback ) {
+function _get( href, callback ) {
+  var options, req, client
+  options = Object.assign(
+      {}
+    , _options
+    , url.parse( href )
+  )
+  client = _if_tls( options.protocol )
+  req = client.request( options, callback )
+  req.on( 'error', _on_error )
+  req.end()
 }
 
 function _gulp_prefix() {
