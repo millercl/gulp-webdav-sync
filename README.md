@@ -1,9 +1,9 @@
 # gulp-webdav-sync
 > Put files and folders to a WebDAV server. Deploy with [gulp](http://gulpjs.com/).
 
-## Usage
-### URL String
-Nominally, pass a URL string.
+## Targeting
+Pass a URL argument indicating a directory/collection on a WebDAV server. Include any HTTP Basic authentication inline. HTTPS authentication must go in the options argument.
+### URL as String
 ```js
 var webdav = require( 'gulp-webdav-sync' )
 
@@ -13,7 +13,7 @@ gulp.task( 'deploy', function () {
     .pipe( webdav( 'http://localhost:8000/js/' ) )
 } )
 ```
-### URL Object
+### URL as Object
 Extend a [URL object](https://nodejs.org/api/url.html#url_url_format_urlobj).
 ```js
 var webdav = require( 'gulp-webdav-sync' )
@@ -70,6 +70,12 @@ otherwise, the result is this.
      * images/
      * js/
 
+## Continuous Deploying: Creates, Updates, Deletes.
+By combining methods, most cases can be satisfied, however deleting directories may be inconsistent.
+If any file changes or there is a creation in the path, then `gulp.watch` will re-stream all files.
+The [`uselastmodified` option](#options.uselastmodified) ( default ) compares the local time to the server time so as to only upload updates.
+Deletes emit a different object; not in the stream, but with a `change` event.
+
 ### With gulp.watch
 [browser-sync](http://www.browsersync.io/docs/gulp/), [npmconf](https://www.npmjs.com/package/npmconf), and [.npmrc](https://docs.npmjs.com/files/npmrc) for a save-sync-reload solution.
 ```shell
@@ -110,7 +116,9 @@ gulp.task( 'load-npmrc', function ( cb ) {
 ```
 
 ### With gulp-watch
-[gulp-watch](https://www.npmjs.com/package/gulp-watch) re-emits created, modified, and deleted files for upload.
+[gulp-watch](https://www.npmjs.com/package/gulp-watch) uses a different strategy of extending the file objects in stream.
+It re-emits created, modified, and deleted files.
+Delete/`unlink` type events are attempted on the server as well.
 ```js
 var watch = require( 'gulp-watch' )
 var webdav = require( 'gulp-webdav-sync' )
