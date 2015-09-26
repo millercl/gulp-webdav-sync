@@ -51,7 +51,7 @@ module.exports = function () {
     , 'headers': { 'User-Agent': PLUGIN_NAME + '/' + VERSION }
     , 'log': 'error'
     , 'logAuth': false
-    , 'parent': process.cwd()
+    , 'base': process.cwd()
     , 'uselastmodified': 1000
   }
   for ( var i in arguments ) {
@@ -125,12 +125,12 @@ module.exports = function () {
     try {
       target_url = _splice_target(
           vinyl.path
-        , path.resolve( _options.parent )
+        , path.resolve( _options.base )
         , href
       )
       target_stem = _splice_target_stem(
           vinyl.path
-        , path.resolve( _options.parent )
+        , path.resolve( _options.base )
         , href
       )
     } catch ( error ) {
@@ -247,12 +247,12 @@ module.exports = function () {
     if ( glob_watcher.type === 'deleted' ) {
       var target_url = _splice_target(
             glob_watcher.path
-          , path.resolve( _options.parent )
+          , path.resolve( _options.base )
           , href
       )
       var target_stem = _splice_target_stem(
             glob_watcher.path
-          , path.resolve( _options.parent )
+          , path.resolve( _options.base )
           , href
       )
       _delete( target_url, function ( res ) {
@@ -563,43 +563,43 @@ function _put( href, vinyl, callback ) {
   req.on( 'error', _on_error )
 }
 
-function _splice_target( vinyl_path, parent_dir, href ) {
+function _splice_target( vinyl_path, base_dir, href ) {
   var error
   var target_stem = ''
   log.var( '$vinyl_path', vinyl_path )
-  log.var( '$parent_dir', parent_dir )
-  if ( vinyl_path.length < parent_dir.length ) {
+  log.var( '$base_dir', base_dir )
+  if ( vinyl_path.length < base_dir.length ) {
     error = new gutil.PluginError(
         PLUGIN_NAME
-      , 'Incoherent Target: options.parent too long.\n'
+      , 'Incoherent Target: options.base too long.\n'
       + '\tpath is ' + chalk.red( vinyl_path ) + '\n'
-      + '\tparent is ' + chalk.red( parent_dir ) + '\n'
+      + '\tbase is ' + chalk.red( base_dir ) + '\n'
     )
     error.vinyl_path = vinyl_path
-    error.parent = parent_dir
+    error.base = base_dir
     throw error
   }
-  target_stem = _splice_target_stem( vinyl_path, parent_dir, href )
+  target_stem = _splice_target_stem( vinyl_path, base_dir, href )
   if ( !href ) {
     href = ''
   }
   return url.resolve( href, target_stem )
 }
 
-function _splice_target_stem( vinyl_path, parent_dir, href ) {
+function _splice_target_stem( vinyl_path, base_dir, href ) {
   var error
   var target_stem
-  if ( vinyl_path.substr( 0, parent_dir.length ) === parent_dir ) {
-    target_stem = vinyl_path.substr( parent_dir.length+1 )
+  if ( vinyl_path.substr( 0, base_dir.length ) === base_dir ) {
+    target_stem = vinyl_path.substr( base_dir.length+1 )
   } else {
     error = new gutil.PluginError(
         PLUGIN_NAME
       , 'Incoherent Target: paths diverge.\n'
       + '\tpath is ' + chalk.red( vinyl_path ) + '\n'
-      + '\tparent is ' + chalk.red( parent_dir ) + '\n'
+      + '\tbase is ' + chalk.red( base_dir ) + '\n'
     )
     error.vinyl_path = vinyl_path
-    error.parent = parent_dir
+    error.base = base_dir
     throw error
   }
   return target_stem

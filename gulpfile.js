@@ -11,14 +11,14 @@ gulp.task( 'default', [ 'int-test' ] )
 
 gulp.task( 'int-test', [ '.npmrc' ], function () {
   return gulp.src( 'test/assets/**' )
-    .pipe( dav( href, { 'log': 'info', 'parent': 'test/assets' } ) )
+    .pipe( dav( href, { 'log': 'info', 'base': 'test/assets' } ) )
     .pipe( debug( { title: 'post' } ) )
 } )
 
 gulp.task( 'watch', [ '.npmrc' ], function () {
   var options = {
     'log': 'info'
-    , 'parent': 'test/assets'
+    , 'base': 'test/assets'
   }
   gulp.watch( 'test/assets/**', [ 'int-test' ] )
     .on( 'change', dav( href, options ).watch )
