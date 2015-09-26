@@ -49,14 +49,14 @@ and this target,
    * images/
    * js/
 
-use the `'parent'` option to constrain the localpath mapping,
+use the `'base'` option to constrain the localpath mapping,
 ```js
 var webdav = require( 'gulp-webdav-sync' )
 
 gulp.task( 'deploy', function () {
   var options = {
       'log': 'info'
-    , 'parent': 'dist'
+    , 'base': 'dist'
     , 'port': 8000
   }
   return gulp.src( 'dist/**' )
@@ -180,7 +180,7 @@ If `options.agent` is `undefined`, then a http[s] agent will be created for the 
   , 'headers': { 'User-Agent': PLUGIN_NAME + '/' + VERSION }
   , 'log': 'error'
   , 'logAuth': false
-  , 'parent': process.cwd()
+  , 'base': process.cwd()
   , 'uselastmodified': 1000
 }
 ```
@@ -210,7 +210,7 @@ Display credentials in logged URLs.
 **Type:** `Boolean`</br>
 **Default:** `false`
 
-### options.parent
+### options.base
 Relative or absolute path which halves the source path [`vinyl.path`] for appending the subsequent to the DAV target URI. Use with glob `**` to prevent super-directories from being created on the target. *e.g.* `gulp.src( 'dist/**' )`.
 
 **Type:** `String`</br>

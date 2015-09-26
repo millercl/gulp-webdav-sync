@@ -140,7 +140,7 @@ describe( PLUGIN_NAME, function () {
         }
     )
 
-    it( 'Should emit an "error" event when "parent" and file paths diverge'
+    it( 'Should emit an "error" event when "base" and file paths diverge'
       , function ( done ) {
           var expected_path = path.join( node, MOCK )
           var mock = new Vinyl( {
@@ -148,7 +148,7 @@ describe( PLUGIN_NAME, function () {
             , contents: new Buffer( MOCK )
           } )
           var options = {
-            'parent': os.tmpDir()
+            'base': os.tmpDir()
           }
           var unit = mod( options, HREF )
           unit.on( 'error', function ( actual ) {
@@ -168,7 +168,7 @@ describe( PLUGIN_NAME, function () {
         }
     )
 
-    it( 'Should emit an "error" event when "parent" is longer than file path'
+    it( 'Should emit an "error" event when "base" is longer than file path'
       , function ( done ) {
           var expected_path = path.join( node, MOCK )
           var mock = new Vinyl( {
@@ -176,7 +176,7 @@ describe( PLUGIN_NAME, function () {
             , contents: new Buffer( MOCK )
           } )
           var options = {
-            'parent': path.join( process.cwd()
+            'base': path.join( process.cwd()
             , MOCK, '/', MOCK )
           }
           var unit = mod( options, HREF )
