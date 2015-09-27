@@ -47,11 +47,12 @@ module.exports = function () {
   var _string
   var codes = []
   _options = {
-    'clean': false
+    'base': process.cwd()
+    , 'clean': false
     , 'headers': { 'User-Agent': PLUGIN_NAME + '/' + VERSION }
+    , 'list': 'target'
     , 'log': 'error'
     , 'logAuth': false
-    , 'base': process.cwd()
     , 'uselastmodified': 1000
   }
   for ( var i in arguments ) {
@@ -139,20 +140,24 @@ module.exports = function () {
       return
     }
     log.var( '$target_url', _strip_url_auth( target_url ) )
-    _propfind( target_url, 0, function ( res, dom ) {
-      if ( res.statusCode === 207 ) {
-        target_propfind = _xml_parse( dom )[0]
-        log.var( '$target_propfind' )
-        log.var( ' .getcontentlength', target_propfind.getcontentlength )
-        log.var( ' .getlastmodified', target_propfind.getlastmodified )
-        log.var( ' .stat', target_propfind.stat )
-        log.var( ' .resourcetype', target_propfind.resourcetype )
-      }
-      if ( res.headers.date ) {
-        server_date = new Date( res.headers.date )
-      }
+    if ( _options.list === 'target' ) {
+      _propfind( target_url, 0, function ( res, dom ) {
+        if ( res.statusCode === 207 ) {
+          target_propfind = _xml_parse( dom )[0]
+          log.var( '$target_propfind' )
+          log.var( ' .getcontentlength', target_propfind.getcontentlength )
+          log.var( ' .getlastmodified', target_propfind.getlastmodified )
+          log.var( ' .stat', target_propfind.stat )
+          log.var( ' .resourcetype', target_propfind.resourcetype )
+        }
+        if ( res.headers.date ) {
+          server_date = new Date( res.headers.date )
+        }
+        init()
+      } )
+    } else {
       init()
-    } )
+    }
 
     function init() {
       function times_are_comparable() {
