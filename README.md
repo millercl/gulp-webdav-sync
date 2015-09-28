@@ -55,8 +55,8 @@ var webdav = require( 'gulp-webdav-sync' )
 
 gulp.task( 'deploy', function () {
   var options = {
-      'log': 'info'
-    , 'base': 'dist'
+      'base': 'dist'
+    , 'log': 'info'
     , 'port': 8000
   }
   return gulp.src( 'dist/**' )
@@ -65,7 +65,7 @@ gulp.task( 'deploy', function () {
 ```
 otherwise, the result is this.
  * localhost:8000/
-   * dist/
+   * _dist/_
      * css/
      * images/
      * js/
@@ -73,7 +73,7 @@ otherwise, the result is this.
 ## Continuous Deploying: Creates, Updates, Deletes.
 By combining methods, most cases can be satisfied, however deleting directories may be inconsistent.
 If any file changes or there is a creation in the path, then `gulp.watch` will re-stream all files.
-The [`uselastmodified` option](#options.uselastmodified) ( default ) compares the local time to the server time so as to only upload updates.
+The [`uselastmodified` option](#optionsuselastmodified) ( default ) compares the local time to the server time so as to only upload updates.
 Deletes emit a different object; not in the stream, but with a `change` event.
 
 ### With gulp.watch
@@ -118,7 +118,7 @@ gulp.task( 'load-npmrc', function ( cb ) {
 ### With gulp-watch
 [gulp-watch](https://www.npmjs.com/package/gulp-watch) uses a different strategy of extending the file objects in stream.
 It re-emits created, modified, and deleted files.
-Delete/`unlink` type events are attempted on the server as well.
+Delete/`'unlink'` type events are attempted on the server as well.
 ```js
 var watch = require( 'gulp-watch' )
 var webdav = require( 'gulp-webdav-sync' )
