@@ -387,6 +387,13 @@ function _delete( href, callback ) {
   req.end()
 }
 
+function _filter_collection( resrc ) {
+  if ( resrc.resourcetype && resrc.resourcetype === 'collection' ) {
+    return true
+  }
+  return false
+}
+
 function _get( href, callback ) {
   var options, req, client
   options = Object.assign(
