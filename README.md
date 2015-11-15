@@ -1,5 +1,27 @@
 # gulp-webdav-sync
-> Put files and folders to a WebDAV server. Deploy with [gulp](http://gulpjs.com/).
+> Put files and folders to a WebDAV server. Deploy with gulp.
+
+* [Targeting](#targeting)
+  * [URL as String](#url-as-string)
+  * [URL as Object](#url-as-object)
+  * [Subdirectories](#subdirectories)
+* [Continuous Deploying: Creates, Updates, Deletes](#continuous-deploying-creates-updates-deletes)
+  * [With gulp.watch](#with-gulpwatch)
+  * [With gulp-watch](#with-gulp-watch)
+* [API](#api)
+  * [webdav( [ href ] [, options ] )](#webdav--href---options--)
+  * [webdav( [ href ] [, options ] ).clean( [ cb ] )](#webdav--href---options--clean--cb--)
+  * [webdav( [ href ] [, options ] ).watch( event [, cb ] )](#webdav--href---options--watch-event--cb--)
+    * [cb](#cb)
+    * [event](#event)
+    * [href](#href)
+    * [options](#options)
+      * [options.base](#optionsbase)
+      * [options.clean](#optionsclean)
+      * [options.log](#optionslog)
+      * [options.logAuth](#optionslogauth)
+      * [options.uselastmodified](#optionsuselastmodified)
+* [Development](#development)
 
 ## Targeting
 Pass a URL argument indicating a directory/collection on a WebDAV server. Include any HTTP Basic authentication inline. HTTPS authentication must go in the options argument.
@@ -70,7 +92,7 @@ otherwise, the result is this.
      * images/
      * js/
 
-## Continuous Deploying: Creates, Updates, Deletes.
+## Continuous Deploying: Creates, Updates, Deletes
 By combining methods, most cases can be satisfied, however deleting directories may be inconsistent.
 If any file changes or there is a creation in the path, then `gulp.watch` will re-stream all files.
 The [`uselastmodified` option](#optionsuselastmodified) ( default ) compares the local time to the server time so as to only upload updates.
@@ -145,6 +167,12 @@ Deletes all resources under `href`.
 ### webdav( [ href ] [, options ] ).watch( event [, cb ] )
 Callback adapter for `'change'` events from `gulp.watch`. Only handles `type: 'deleted'` events. `gulp.src` does not push deleted files; use this or [gulp-watch](https://github.com/floatdrop/gulp-watch) instead. Calls back regardless of `event.type`.
 
+#### cb
+Optional, asynchronous, callback function.
+
+**Type:** `Function`</br>
+**Default:** `undefined`
+
 #### event
 [glob-watcher](https://github.com/wearefractal/glob-watcher/blob/master/index.js#L10) event.
 ```js
@@ -157,18 +185,12 @@ Callback adapter for `'change'` events from `gulp.watch`. Only handles `type: 'd
 **Type:** `Object`</br>
 **Default:** `undefined`
 
-#### cb
-Optional, asynchronous, callback function.
-
-**Type:** `Function`</br>
-**Default:** `undefined`
-
-## href
+#### href
 
 **Type:** `String`</br>
 **Default:** `undefined`
 
-## options
+#### options
 Superset of [http.request options parameter](https://nodejs.org/api/http.html#http_http_request_options_callback), [https.request options parameter](https://nodejs.org/api/https.html#https_https_request_options_callback), and [url.object](https://nodejs.org/api/url.html#url_url_format_urlobj). If any URL properties are defined, then `protocol`, `hostname`, and `pathname` are assigned to `http://localhost/`.
 If `options.agent` is `undefined`, then a http[s] agent will be created for the stream.
 
@@ -185,13 +207,19 @@ If `options.agent` is `undefined`, then a http[s] agent will be created for the 
 }
 ```
 
-### options.clean
+##### options.base
+Relative or absolute path which halves the source path [`vinyl.path`] for appending the subsequent to the DAV target URI. Use with glob `**` to prevent super-directories from being created on the target. *e.g.* `gulp.src( 'dist/**' )`.
+
+**Type:** `String`</br>
+**Default:** `process.cwd()`
+
+##### options.clean
 Deletes corresponding resources on server instead of uploading. Note, glob star-star will delete directories before contents are pushed.
 
 **Type:** `Boolean`</br>
 **Default:** `false`
 
-### options.log
+##### options.log
 Logging threshold. Orthogonal to the `console` methods.
 
  string   |   output
@@ -204,19 +232,13 @@ Logging threshold. Orthogonal to the `console` methods.
 **Type:** `String`</br>
 **Default:** `'error'`
 
-### options.logAuth
+##### options.logAuth
 Display credentials in logged URLs.
 
 **Type:** `Boolean`</br>
 **Default:** `false`
 
-### options.base
-Relative or absolute path which halves the source path [`vinyl.path`] for appending the subsequent to the DAV target URI. Use with glob `**` to prevent super-directories from being created on the target. *e.g.* `gulp.src( 'dist/**' )`.
-
-**Type:** `String`</br>
-**Default:** `process.cwd()`
-
-### options.uselastmodified
+##### options.uselastmodified
 Compare remote `getlastmodified` versus local ( changed ) `ctime`.
 Only `PUT` if `ctime` is newer than `getlastmodified`.
 Numeric value in milliseconds is the tolerance interval for qualifying client-server synchronization.
@@ -236,4 +258,5 @@ npm test
 npm set dav http://user:pass@localhost:8000/
 gulp
 ```
+
 
