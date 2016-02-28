@@ -265,6 +265,7 @@ module.exports = function () {
           codes.push( res.statusCode )
         }
         _info_status( res.statusCode, target_stem )
+        _info_status_code( codes )
         if ( callback && typeof callback === 'function' ) {
           callback()
         }
@@ -296,6 +297,7 @@ module.exports = function () {
               }
           )
         } else {
+          _info_status_code( codes )
           if ( callback ) {
             callback()
           }
@@ -305,12 +307,7 @@ module.exports = function () {
     } )
   }
   stream.on( 'finish', function () {
-    codes = codes.filter( function ( code ) {
-      return !( code === 200 || code === 404 )
-    } )
-    codes.sort().forEach( function ( element ) {
-      _info_code( element )
-    } )
+    _info_status_code( codes )
   } )
   return stream
 }
@@ -437,6 +434,15 @@ function _info_status( statusCode, string ) {
     _colorcode_statusCode_fn( statusCode )
       .call( this, statusCode )
   log.info( _gulp_prefix(), code, string )
+}
+
+function _info_status_code( codes ) {
+  codes = codes.filter( function ( code ) {
+    return !( code === 200 || code === 404 )
+  } )
+  codes.sort().forEach( function ( element ) {
+    _info_code( element )
+  } )
 }
 
 function _info_code( statusCode ) {
