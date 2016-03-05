@@ -1,5 +1,6 @@
 # gulp-webdav-sync
-> Put files and folders to a WebDAV server. Deploy with gulp.
+> Deploy files and folders via WebDAV
+![screenshot](https://github.com/millercl/gulp-webdav-sync/raw/master/screenshot.png)
 
 * [Targeting](#targeting)
   * [URL as String](#url-as-string)
