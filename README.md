@@ -2,7 +2,7 @@
 > Deploy files and folders via WebDAV
 ![screenshot](https://github.com/millercl/gulp-webdav-sync/raw/master/screenshot.png)
 
-* [Targeting](#targeting)
+* [Destinations](#destinations)
   * [URL as String](#url-as-string)
   * [URL as Object](#url-as-object)
   * [Subdirectories](#subdirectories)
@@ -24,8 +24,8 @@
       * [options.uselastmodified](#optionsuselastmodified)
 * [Development](#development)
 
-## Targeting
-Pass a URL argument indicating a directory/collection on a WebDAV server. Include any HTTP Basic authentication inline. HTTPS authentication must go in the options argument.
+## Destinations 
+Pass a URL argument indicating a directory/collection on a WebDAV server. Include any HTTP Basic authentication inline. HTTPS authentication must go in the options argument. [`gulp.dest()`](https://github.com/gulpjs/gulp/blob/master/docs/API.md#gulpdestpath-options) is only for the filesystem. Instead, pipe to this module, where the stream objects are consumed.
 ### URL as String
 ```js
 var webdav = require( 'gulp-webdav-sync' )
@@ -66,7 +66,7 @@ Suppose the following directory tree,
      * images/
      * js/
 
-and this target,
+and this destination,
  * localhost:8000/
    * css/
    * images/
@@ -209,7 +209,7 @@ If `options.agent` is `undefined`, then a http[s] agent will be created for the 
 ```
 
 ##### options.base
-Relative or absolute path which halves the source path [`vinyl.path`] for appending the subsequent to the DAV target URI. Use with glob `**` to prevent super-directories from being created on the target. *e.g.* `gulp.src( 'dist/**' )`.
+Relative or absolute path which halves the source path [`vinyl.path`] for appending the subsequent to the DAV destination URI. Use with glob `**` to prevent super-directories from being created on the destination. *e.g.* `gulp.src( 'dist/**' )`.
 
 **Type:** `String`</br>
 **Default:** `process.cwd()`
