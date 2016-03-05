@@ -8,11 +8,11 @@ if ( !Object.assign ) {
   Object.defineProperty( Object, 'assign', {
     configurable: true
     , enumerable: false
-    , value: function ( target ) {
-      if ( target === undefined || target === null ) {
+    , value: function ( dest ) {
+      if ( dest === undefined || dest === null ) {
         throw new TypeError( 'Cannot convert first argument to object' )
       }
-      var to = Object( target )
+      var to = Object( dest )
       var nextSource
       for ( var i = 1 ; i < arguments.length ; i++ ) {
         nextSource = arguments[i]
@@ -50,7 +50,7 @@ module.exports = function () {
     'base': process.cwd()
     , 'clean': false
     , 'headers': { 'User-Agent': PLUGIN_NAME + '/' + VERSION }
-    , 'list': 'target'
+    , 'list': 'dest'
     , 'log': 'error'
     , 'logAuth': false
     , 'uselastmodified': 1000
@@ -91,7 +91,7 @@ module.exports = function () {
   } else {
     href = 'http://localhost/'
   }
-  _info_target( href )
+  _info_dest( href )
   if ( _options.agent === undefined ) {
     var agent = url.parse( href ).protocol === 'https:'
       ? new https.Agent( _options )
@@ -119,17 +119,17 @@ module.exports = function () {
     } else {
       vinyl.event = null
     }
-    var target_url
-    var target_stem
-    var target_propfind = {}
+    var dest_url
+    var dest_stem
+    var dest_propfind = {}
     var server_date
     try {
-      target_url = _splice_target(
+      dest_url = _splice_dest(
           vinyl.path
         , path.resolve( _options.base )
         , href
       )
-      target_stem = _splice_target_stem(
+      dest_stem = _splice_dest_stem(
           vinyl.path
         , path.resolve( _options.base )
         , href
@@ -139,16 +139,16 @@ module.exports = function () {
       callback( null, vinyl )
       return
     }
-    log.var( '$target_url', _strip_url_auth( target_url ) )
-    if ( _options.list === 'target' ) {
-      _propfind( target_url, 0, function ( res, dom ) {
+    log.var( '$dest_url', _strip_url_auth( dest_url ) )
+    if ( _options.list === 'dest' ) {
+      _propfind( dest_url, 0, function ( res, dom ) {
         if ( res.statusCode === 207 ) {
-          target_propfind = _xml_parse( dom )[0]
-          log.var( '$target_propfind' )
-          log.var( ' .getcontentlength', target_propfind.getcontentlength )
-          log.var( ' .getlastmodified', target_propfind.getlastmodified )
-          log.var( ' .stat', target_propfind.stat )
-          log.var( ' .resourcetype', target_propfind.resourcetype )
+          dest_propfind = _xml_parse( dom )[0]
+          log.var( '$dest_propfind' )
+          log.var( ' .getcontentlength', dest_propfind.getcontentlength )
+          log.var( ' .getlastmodified', dest_propfind.getlastmodified )
+          log.var( ' .stat', dest_propfind.stat )
+          log.var( ' .resourcetype', dest_propfind.resourcetype )
         }
         if ( res.headers.date ) {
           server_date = new Date( res.headers.date )
@@ -161,7 +161,7 @@ module.exports = function () {
 
     function init() {
       function times_are_comparable() {
-        return target_propfind.getlastmodified && vinyl.stat && vinyl.stat.ctime
+        return dest_propfind.getlastmodified && vinyl.stat && vinyl.stat.ctime
       }
       function server_is_synchronized() {
         var now = new Date()
@@ -178,8 +178,8 @@ module.exports = function () {
         var ctime = vinyl.stat
           ? vinyl.stat.ctime.getTime()
           : null
-        var lastmodified = target_propfind.getlastmodified
-          ? target_propfind.getlastmodified.getTime()
+        var lastmodified = dest_propfind.getlastmodified
+          ? dest_propfind.getlastmodified.getTime()
           : null
         var newer = ctime > lastmodified
         log.var( '$ctime', ctime )
@@ -187,43 +187,43 @@ module.exports = function () {
         log.var( '$newer', newer )
         return newer
       }
-      var list = target_propfind ? [ target_propfind ] : []
+      var list = dest_propfind ? [ dest_propfind ] : []
       var path_
-      if ( target_url === href ) {
+      if ( dest_url === href ) {
         callback()
         return
       }
       if ( vinyl.event === 'unlink'  || _options.clean ) {
-        _delete( target_url, resume )
+        _delete( dest_url, resume )
         return
       }
       if ( vinyl.isNull() ) {
-        target_stem += '/'
+        dest_stem += '/'
         if ( vinyl.stat && !vinyl.stat.isDirectory() ) {
           log.warn(
               _gulp_prefix( 'warn' )
             , vinyl.path + ' is not a directory.'
           )
         }
-        path_ = filter_on_href( list, target_url )
+        path_ = filter_on_href( list, dest_url )
         if ( path_.length === 1 ) {
           resume( { statusCode: path_[0].stat } )
         } else {
-          _mkcol( target_url, resume )
+          _mkcol( dest_url, resume )
         }
         return
       }
       if ( vinyl.isBuffer() || vinyl.isStream() ) {
         if ( _options.uselastmodified && times_are_comparable() ) {
           if ( server_is_synchronized() && ctime_is_newer() ) {
-            _put( target_url, vinyl, resume )
+            _put( dest_url, vinyl, resume )
             return
           } else {
-            resume( { statusCode: target_propfind.stat } )
+            resume( { statusCode: dest_propfind.stat } )
             return
           }
         } else {
-          _put( target_url, vinyl, resume )
+          _put( dest_url, vinyl, resume )
           return
         }
       }
@@ -235,7 +235,7 @@ module.exports = function () {
         if ( codes.indexOf( res.statusCode ) === -1 ) {
           codes.push( res.statusCode )
         }
-        _info_status( res.statusCode, target_stem )
+        _info_status( res.statusCode, dest_stem )
       }
       callback()
     }
@@ -250,21 +250,21 @@ module.exports = function () {
     }
     log.var( 'glob_watcher.path', glob_watcher.path )
     if ( glob_watcher.type === 'deleted' ) {
-      var target_url = _splice_target(
+      var dest_url = _splice_dest(
             glob_watcher.path
           , path.resolve( _options.base )
           , href
       )
-      var target_stem = _splice_target_stem(
+      var dest_stem = _splice_dest_stem(
             glob_watcher.path
           , path.resolve( _options.base )
           , href
       )
-      _delete( target_url, function ( res ) {
+      _delete( dest_url, function ( res ) {
         if ( codes.indexOf( res.statusCode ) === -1 ) {
           codes.push( res.statusCode )
         }
-        _info_status( res.statusCode, target_stem )
+        _info_status( res.statusCode, dest_stem )
         _info_status_code( codes )
         if ( callback && typeof callback === 'function' ) {
           callback()
@@ -455,7 +455,7 @@ function _info_code( statusCode ) {
   log.info( _gulp_prefix(), code, msg )
 }
 
-function _info_target( href ) {
+function _info_dest( href ) {
   if ( _options.logAuth !== true ) {
     href = _strip_url_auth( href )
   }
@@ -581,9 +581,9 @@ function _put( href, vinyl, callback ) {
   req.on( 'error', _on_error )
 }
 
-function _splice_target( vinyl_path, base_dir, href ) {
+function _splice_dest( vinyl_path, base_dir, href ) {
   var error
-  var target_stem = ''
+  var dest_stem = ''
   log.var( '$vinyl_path', vinyl_path )
   log.var( '$base_dir', base_dir )
   if ( vinyl_path.length < base_dir.length ) {
@@ -597,18 +597,18 @@ function _splice_target( vinyl_path, base_dir, href ) {
     error.base = base_dir
     throw error
   }
-  target_stem = _splice_target_stem( vinyl_path, base_dir, href )
+  dest_stem = _splice_dest_stem( vinyl_path, base_dir, href )
   if ( !href ) {
     href = ''
   }
-  return url.resolve( href, target_stem )
+  return url.resolve( href, dest_stem )
 }
 
-function _splice_target_stem( vinyl_path, base_dir, href ) {
+function _splice_dest_stem( vinyl_path, base_dir, href ) {
   var error
-  var target_stem
+  var dest_stem
   if ( vinyl_path.substr( 0, base_dir.length ) === base_dir ) {
-    target_stem = vinyl_path.substr( base_dir.length+1 )
+    dest_stem = vinyl_path.substr( base_dir.length+1 )
   } else {
     error = new gutil.PluginError(
         PLUGIN_NAME
@@ -620,7 +620,7 @@ function _splice_target_stem( vinyl_path, base_dir, href ) {
     error.base = base_dir
     throw error
   }
-  return target_stem
+  return dest_stem
 }
 
 function _strip_url_auth( href ) {
