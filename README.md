@@ -33,7 +33,7 @@ var webdav = require( 'gulp-webdav-sync' )
 // put index.js to http://localhost:8000/js/index.js
 gulp.task( 'deploy', function () {
   return gulp.src( 'index.js' )
-    .pipe( webdav( 'http://localhost:8000/js/' ) )
+    .pipe( webdav( 'http://user:pass@localhost:8000/js/' ) )
 } )
 ```
 ### URL as Object
