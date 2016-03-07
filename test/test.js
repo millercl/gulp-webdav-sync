@@ -2,6 +2,7 @@ var assert = require( 'assert' )
 var dav = require( 'jsDAV' )
 var del = require( 'del' )
 var fs = require( 'fs' )
+var merge = require( 'merge-stream' )
 var mod = require( '../index' )
 var net = require( 'net' )
 var npmconf = require( 'npmconf' )
@@ -482,6 +483,55 @@ describe( PLUGIN_NAME, function () {
                 fs.readFileSync( expected_path ).toString()
               , MOCK
               , 'file contents'
+            )
+            done()
+          }
+        }
+    )
+
+    it( 'Should support concurrent calls with multiple options.base values'
+      , function ( done ) {
+          var opt1 = {
+            base: process.cwd()
+            , log: 'error'
+          }
+          var opt2 = {
+            base: 'dir'
+            , log: 'error'
+          }
+          var mock1 = new Vinyl( {
+            path: path.resolve( MOCK + '1' )
+            , contents: new Buffer( MOCK )
+            , stat: { ctime: new Date() }
+          } )
+          var mock2 = new Vinyl( {
+            path: path.resolve( 'dir/' + MOCK + '2' )
+            , contents: new Buffer( MOCK )
+            , stat: { ctime: new Date() }
+          } )
+          var expected_path1 = path.join( node, MOCK + '1' )
+          var expected_path2 = path.join( node, MOCK + '2' )
+          var unit1 = mod( HREF, opt1 )
+          var unit2 = mod( HREF, opt2 )
+          assert.notEqual( unit1, unit2, 'different streams' )
+          var unit3 = merge( unit1, unit2 )
+          unit1.write( mock1, null, null )
+          unit2.write( mock2, null, null )
+          unit1.end()
+          unit2.end()
+          unit3.on( 'finish', validate )
+          function validate() {
+            assert( fs.existsSync( expected_path1 ), 'mock1 file exists' )
+            assert( fs.existsSync( expected_path2 ), 'mock2 file exists' )
+            assert.equal(
+                fs.readFileSync( expected_path1 ).toString()
+              , MOCK
+              , 'mock1 file contents'
+            )
+            assert.equal(
+                fs.readFileSync( expected_path2 ).toString()
+              , MOCK
+              , 'mock2 file contents'
             )
             done()
           }

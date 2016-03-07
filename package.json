@@ -28,6 +28,7 @@
     "gulp-jscs": "~1.6.0",
     "jsDAV": "~0.3.2",
     "jshint-stylish": "~2.0.1",
+    "merge-stream": "~1.0.0",
     "mocha": "~2.2.5",
     "npmconf": "~2.1.2",
     "run-sequence": "~1.1.1",

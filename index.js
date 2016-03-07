@@ -41,12 +41,11 @@ var xml2js = require( 'xml2js' )
 const PLUGIN_NAME = 'gulp-webdav-sync'
 const VERSION = require( './package.json' ).version
 var stream
-var _options
 
 module.exports = function () {
   var _string
   var codes = []
-  _options = {
+  var _options = {
     'base': process.cwd()
     , 'clean': false
     , 'headers': { 'User-Agent': PLUGIN_NAME + '/' + VERSION }
@@ -91,7 +90,8 @@ module.exports = function () {
   } else {
     href = 'http://localhost/'
   }
-  _info_dest( href )
+  var log = new Log( _options )
+  _info_dest( href, _options )
   if ( _options.agent === undefined ) {
     var agent = url.parse( href ).protocol === 'https:'
       ? new https.Agent( _options )
@@ -128,11 +128,13 @@ module.exports = function () {
           vinyl.path
         , path.resolve( _options.base )
         , href
+        , _options
       )
       dest_stem = _splice_dest_stem(
           vinyl.path
         , path.resolve( _options.base )
         , href
+        , _options
       )
     } catch ( error ) {
       _on_error( error )
@@ -141,7 +143,7 @@ module.exports = function () {
     }
     log.var( '$dest_url', _strip_url_auth( dest_url ) )
     if ( _options.list === 'dest' ) {
-      _propfind( dest_url, 0, function ( res, dom ) {
+      _propfind( dest_url, 0, _options, function ( res, dom ) {
         if ( res.statusCode === 207 ) {
           dest_propfind = _xml_parse( dom )[0]
           log.var( '$dest_propfind' )
@@ -194,7 +196,7 @@ module.exports = function () {
         return
       }
       if ( vinyl.event === 'unlink'  || _options.clean ) {
-        _delete( dest_url, resume )
+        _delete( dest_url, _options, resume )
         return
       }
       if ( vinyl.isNull() ) {
@@ -209,21 +211,21 @@ module.exports = function () {
         if ( path_.length === 1 ) {
           resume( { statusCode: path_[0].stat } )
         } else {
-          _mkcol( dest_url, resume )
+          _mkcol( dest_url, _options, resume )
         }
         return
       }
       if ( vinyl.isBuffer() || vinyl.isStream() ) {
         if ( _options.uselastmodified && times_are_comparable() ) {
           if ( server_is_synchronized() && ctime_is_newer() ) {
-            _put( dest_url, vinyl, resume )
+            _put( dest_url, vinyl, _options, resume )
             return
           } else {
             resume( { statusCode: dest_propfind.stat } )
             return
           }
         } else {
-          _put( dest_url, vinyl, resume )
+          _put( dest_url, vinyl, _options, resume )
           return
         }
       }
@@ -235,7 +237,7 @@ module.exports = function () {
         if ( codes.indexOf( res.statusCode ) === -1 ) {
           codes.push( res.statusCode )
         }
-        _info_status( res.statusCode, dest_stem )
+        _info_status( res.statusCode, dest_stem, _options )
       }
       callback()
     }
@@ -254,18 +256,20 @@ module.exports = function () {
             glob_watcher.path
           , path.resolve( _options.base )
           , href
+          , _options
       )
       var dest_stem = _splice_dest_stem(
             glob_watcher.path
           , path.resolve( _options.base )
           , href
+          , _options
       )
-      _delete( dest_url, function ( res ) {
+      _delete( dest_url, _options, function ( res ) {
         if ( codes.indexOf( res.statusCode ) === -1 ) {
           codes.push( res.statusCode )
         }
-        _info_status( res.statusCode, dest_stem )
-        _info_status_code( codes )
+        _info_status( res.statusCode, dest_stem, _options )
+        _info_status_code( codes, _options )
         if ( callback && typeof callback === 'function' ) {
           callback()
         }
@@ -277,7 +281,7 @@ module.exports = function () {
     }
   }
   stream.clean = function ( callback ) {
-    _propfind( href, 1, function ( res, dom ) {
+    _propfind( href, 1, _options, function ( res, dom ) {
       var url_paths = _xml_to_url_a( dom )
       url_paths = url_paths.filter(
         function ( url_path ) {
@@ -288,16 +292,17 @@ module.exports = function () {
         if ( url_paths.length > 0 ) {
           var element = url_paths.pop()
           _delete( url.resolve( href, element )
+            , _options
             , function ( res ) {
                 if ( codes.indexOf( res.statusCode ) === -1 ) {
                   codes.push( res.statusCode )
                 }
-                _info_status( res.statusCode, element )
+                _info_status( res.statusCode, element, _options )
                 recursive_delete( url_paths )
               }
           )
         } else {
-          _info_status_code( codes )
+          _info_status_code( codes, _options )
           if ( callback ) {
             callback()
           }
@@ -307,7 +312,7 @@ module.exports = function () {
     } )
   }
   stream.on( 'finish', function () {
-    _info_status_code( codes )
+    _info_status_code( codes, _options )
   } )
   return stream
 }
@@ -370,7 +375,7 @@ function _colorcode_statusMessage_fn( statusMessage ) {
   }
 }
 
-function _delete( href, callback ) {
+function _delete( href, _options, callback ) {
   var options, req, client
   options = Object.assign(
       {}
@@ -391,7 +396,7 @@ function _filter_collection( resrc ) {
   return false
 }
 
-function _get( href, callback ) {
+function _get( href, _options, callback ) {
   var options, req, client
   options = Object.assign(
       {}
@@ -429,23 +434,25 @@ function _if_tls( scheme ) {
   }
 }
 
-function _info_status( statusCode, string ) {
+function _info_status( statusCode, string, _options ) {
+  var log = new Log( _options )
   var code =
     _colorcode_statusCode_fn( statusCode )
       .call( this, statusCode )
   log.info( _gulp_prefix(), code, string )
 }
 
-function _info_status_code( codes ) {
+function _info_status_code( codes, _options ) {
   codes = codes.filter( function ( code ) {
     return !( code === 200 || code === 404 )
   } )
   codes.sort().forEach( function ( element ) {
-    _info_code( element )
+    _info_code( element, _options )
   } )
 }
 
-function _info_code( statusCode ) {
+function _info_code( statusCode, _options ) {
+  var log = new Log( _options )
   var code =
     _colorcode_statusCode_fn( statusCode )
       .call( this, statusCode )
@@ -455,7 +462,8 @@ function _info_code( statusCode ) {
   log.info( _gulp_prefix(), code, msg )
 }
 
-function _info_dest( href ) {
+function _info_dest( href, _options ) {
+  var log = new Log( _options )
   if ( _options.logAuth !== true ) {
     href = _strip_url_auth( href )
   }
@@ -463,7 +471,7 @@ function _info_dest( href ) {
   log.info( _gulp_prefix(), to )
 }
 
-var log = ( function () {
+var Log = function ( _options ) {
   var methods = [ 'error', 'warn', 'info', 'log' ]
   var _log = {}
   methods.forEach( function ( element, index, array ) {
@@ -473,16 +481,15 @@ var log = ( function () {
       }
     }
   } )
+  _log.var = function () {
+    var args = Array.prototype.slice.call( arguments )
+    var last = args.length > 1 ? args.pop() : ''
+    _log.log( _gulp_prefix( 'log' ), chalk.grey( args.join( ' ' ) ), last )
+  }
   return _log
-} )()
-
-log.var = function () {
-  var args = Array.prototype.slice.call( arguments )
-  var last = args.length > 1 ? args.pop() : ''
-  log.log( _gulp_prefix( 'log' ), chalk.grey( args.join( ' ' ) ), last )
 }
 
-function _mkcol( href, callback ) {
+function _mkcol( href, _options, callback ) {
   var options, req, client
   options = Object.assign(
       {}
@@ -500,7 +507,7 @@ function _on_error( error ) {
   stream.emit( 'error', error )
 }
 
-function _propfind( href, depth, callback ) {
+function _propfind( href, depth, _options, callback ) {
   var options, req, client
   options = Object.assign(
       {}
@@ -532,7 +539,7 @@ function _propfind( href, depth, callback ) {
   req.end()
 }
 
-function _proppatch( href, props, callback ) {
+function _proppatch( href, props, _options, callback ) {
   var options, xml, req
   options = Object.assign(
       {}
@@ -567,7 +574,7 @@ function _proppatch_( href, date, cb ) {
   } )
 }
 
-function _put( href, vinyl, callback ) {
+function _put( href, vinyl, _options, callback ) {
   var options, req, client
   options = Object.assign(
       {}
@@ -581,9 +588,10 @@ function _put( href, vinyl, callback ) {
   req.on( 'error', _on_error )
 }
 
-function _splice_dest( vinyl_path, base_dir, href ) {
+function _splice_dest( vinyl_path, base_dir, href, _options ) {
   var error
   var dest_stem = ''
+  var log = new Log( _options )
   log.var( '$vinyl_path', vinyl_path )
   log.var( '$base_dir', base_dir )
   if ( vinyl_path.length < base_dir.length ) {
@@ -597,16 +605,17 @@ function _splice_dest( vinyl_path, base_dir, href ) {
     error.base = base_dir
     throw error
   }
-  dest_stem = _splice_dest_stem( vinyl_path, base_dir, href )
+  dest_stem = _splice_dest_stem( vinyl_path, base_dir, href, _options )
   if ( !href ) {
     href = ''
   }
   return url.resolve( href, dest_stem )
 }
 
-function _splice_dest_stem( vinyl_path, base_dir, href ) {
+function _splice_dest_stem( vinyl_path, base_dir, href, _options ) {
   var error
   var dest_stem
+  var log = new Log( _options )
   if ( vinyl_path.substr( 0, base_dir.length ) === base_dir ) {
     dest_stem = vinyl_path.substr( base_dir.length+1 )
   } else {
