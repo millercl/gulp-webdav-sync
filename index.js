@@ -63,6 +63,9 @@ module.exports = function () {
     }
   }
   if ( _options ) {
+    if ( typeof _options.base !== 'undefined' ) {
+      _options.base = path.normalize( path.resolve( _options.base ) )
+    }
     if ( _options.protocol
       || _options.slashes
       || _options.auth
@@ -126,13 +129,13 @@ module.exports = function () {
     try {
       dest_url = _splice_dest(
           vinyl.path
-        , path.resolve( _options.base )
+        , _options.base
         , href
         , _options
       )
       dest_stem = _splice_dest_stem(
           vinyl.path
-        , path.resolve( _options.base )
+        , _options.base
         , href
         , _options
       )
@@ -617,7 +620,7 @@ function _splice_dest_stem( vinyl_path, base_dir, href, _options ) {
   var dest_stem
   var log = new Log( _options )
   if ( vinyl_path.substr( 0, base_dir.length ) === base_dir ) {
-    dest_stem = vinyl_path.substr( base_dir.length+1 )
+    dest_stem = path.relative( base_dir, vinyl_path )
   } else {
     error = new gutil.PluginError(
         PLUGIN_NAME
