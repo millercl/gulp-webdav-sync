@@ -1,6 +1,6 @@
 {
   "name": "gulp-webdav-sync",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Put files and folders on a WebDAV server. Deploy with gulp",
   "repository": {
     "type": "git",
@@ -31,7 +31,6 @@
     "merge-stream": "~1.0.0",
     "mocha": "~2.2.5",
     "npmconf": "~2.1.2",
-    "run-sequence": "~1.1.1",
     "vinyl": "~0.5.0"
   },
   "dependencies": {
