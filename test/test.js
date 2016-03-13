@@ -538,6 +538,63 @@ describe( PLUGIN_NAME, function () {
         }
     )
 
+    it( 'Should accept current working directory\'s root for options.base'
+      , function ( done ) {
+          var root = process.cwd().split( path.sep )[0] + path.sep
+          var expected_path = path.join( node, MOCK )
+          var mock = new Vinyl( {
+            path: path.resolve( root, MOCK )
+            , contents: new Buffer( MOCK )
+            , stat: { ctime: new Date() }
+          } )
+          assert( mock.isBuffer(), 'vinyl.isBuffer()' )
+          var options = {
+            log: 'error'
+            , base: root
+          }
+          var unit = mod( HREF, options )
+          unit.write( mock, null, validate )
+          unit.end()
+          function validate() {
+            assert( fs.existsSync( expected_path ), expected_path )
+            assert.equal(
+                fs.readFileSync( expected_path ).toString()
+              , MOCK
+              , 'file contents'
+            )
+            done()
+          }
+        }
+    )
+
+    it( 'Should accept null string as cwd for options.base'
+      , function ( done ) {
+          var expected_path = path.join( node, MOCK )
+          var mock = new Vinyl( {
+            path: path.resolve( MOCK )
+            , contents: new Buffer( MOCK )
+            , stat: { ctime: new Date() }
+          } )
+          assert( mock.isBuffer(), 'vinyl.isBuffer()' )
+          var options = {
+            log: 'error'
+            , base: ''
+          }
+          var unit = mod( HREF, options )
+          unit.write( mock, null, validate )
+          unit.end()
+          function validate() {
+            assert( fs.existsSync( expected_path ), expected_path )
+            assert.equal(
+                fs.readFileSync( expected_path ).toString()
+              , MOCK
+              , 'file contents'
+            )
+            done()
+          }
+        }
+    )
+
   } )
 
   describe( '#main().watch', function () {
