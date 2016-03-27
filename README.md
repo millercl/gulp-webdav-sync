@@ -1,5 +1,4 @@
 # gulp-webdav-sync
-> Deploy files and folders via WebDAV
 ![screenshot](https://github.com/millercl/gulp-webdav-sync/raw/master/screenshot.png)
 
 * [Similar Projects](#similar-projects)
