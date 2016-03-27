@@ -2,6 +2,7 @@
 > Deploy files and folders via WebDAV
 ![screenshot](https://github.com/millercl/gulp-webdav-sync/raw/master/screenshot.png)
 
+* [Similar Projects](#similar-projects)
 * [Destinations](#destinations)
   * [URL as String](#url-as-string)
   * [URL as Object](#url-as-object)
@@ -23,6 +24,15 @@
       * [options.logAuth](#optionslogauth)
       * [options.uselastmodified](#optionsuselastmodified)
 * [Development](#development)
+
+## Similar Projects
+1. [grunt-webdav-sync](https://github.com/avisi/grunt-webdav-sync) for [Grunt](http://www.gruntjs.com).
+2. [webdav-sync](https://github.com/bermi/webdav-sync), a nodejs command line utility.
+3. [curl](https://github.com/curl/curl), a C command line utility for HTTP.
+```shell
+curl -T "index.js" http://user:pass@localhost:8000/
+curl -X MKCOL http://user:pass@localhost:8000/dir/
+```
 
 ## Destinations 
 Pass a URL argument indicating a directory/collection on a WebDAV server. Include any HTTP Basic authentication inline. HTTPS authentication must go in the options argument. [`gulp.dest()`](https://github.com/gulpjs/gulp/blob/master/docs/API.md#gulpdestpath-options) is only for the filesystem. Instead, pipe to this module, where the stream objects are consumed.
