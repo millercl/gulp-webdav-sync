@@ -125,7 +125,7 @@ describe( PLUGIN_NAME, function () {
           expected.syscall = 'connect'
           var unit = mod( url.format( mal ) )
           unit.on( 'error', function ( actual ) {
-            assert.deepEqual( actual, expected, 'error is ECONNREFUSED' )
+            assert.equal( actual.code, expected.code, 'error is ECONNREFUSED' )
             validate()
           } )
           unit.write( mock, null, null )
