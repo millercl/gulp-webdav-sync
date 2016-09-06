@@ -111,7 +111,7 @@ describe( PLUGIN_NAME, function () {
             protocol: uri.protocol
             , slashes: uri.slashes
             , auth: uri.auth
-            , port: 65536
+            , port: 65535
             , hostname: uri.hostname
             , hash: uri.hash
             , search: uri.search
