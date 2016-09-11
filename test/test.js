@@ -8,14 +8,17 @@ var net = require( 'net' )
 var npmconf = require( 'npmconf' )
 var os = require( 'os' )
 var path = require( 'path' )
+var rfc2518 = require( '../lib/rfc2518' )
 var stream = require( 'stream' )
 var tls = require( 'tls' )
 var url = require( 'url' )
 var Vinyl = require( 'vinyl' )
+var xml2js = require( 'xml2js' )
 
 const PLUGIN_NAME = 'gulp-webdav-sync'
 const HREF = 'http://localhost:8000/'
 const MOCK = 'mock'
+const MSR_DIR = './test/assets/multistatus/'
 const TEMP = 'tmp'
 const TLS_PORT = 8443
 const CA_CERT = './test/assets/certs/ca.pem'
@@ -692,6 +695,38 @@ describe( PLUGIN_NAME, function () {
           }
         }
     )
+
+  } )
+
+  describe( '#rfc2518.tr_207', function ( done ) {
+
+    it( 'Should parse and translate multistatus response XML content'
+      , function ( done ) {
+          var files = fs.readdirSync( MSR_DIR )
+          files.forEach( parse )
+          function parse( file ) {
+            var content = fs.readFileSync( path.join( MSR_DIR, file ) )
+            var opt = {
+              explicitCharkey: true
+              , tagNameProcessors: [ xml2js.processors.stripPrefix ]
+            }
+            assert.doesNotThrow( function () {
+              xml2js.parseString( content, opt, function ( err, result ) {
+                assert.ifError( err ) 
+                assert.doesNotThrow( function () {
+                  var propfound = rfc2518.tr_207( result )
+                  assert( propfound, 'tr_207' )
+                  assert( propfound instanceof Array, 'instanceof Array' )
+                  propfound.forEach( function( r ) {
+                    assert( 'href' in r, 'href attribute' )
+                    assert( typeof r.href === 'string' )
+                  } )
+                } )
+              } )
+            }, 'xml2js.parseString' )
+          }
+          done()
+    } )
 
   } )
 
