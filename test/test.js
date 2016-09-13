@@ -720,6 +720,26 @@ describe( PLUGIN_NAME, function () {
         }
     )
 
+    it ( 'Should accept dom w/ only href property on result'
+      , function () {
+          var mock = {
+              multistatus: {
+                  response: [
+                    {
+                        href: [
+                            { _: '/' }
+                        ]
+                    }
+                  ]
+              }
+          }
+          var propfound = rfc2518.tr_207( mock )
+          assert( propfound, 'tr_207 return object' )
+          assert( propfound[0], 'first result' )
+          assert( propfound[0].href, 'href property on first result' )
+        }
+    )
+
     it( 'Should translate multistatus-response xml2js DOMs'
       , function () {
           files.forEach( translate )
