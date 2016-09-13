@@ -699,14 +699,14 @@ describe( PLUGIN_NAME, function () {
   } )
 
   describe( '#rfc2518.tr_207', function () {
+    var opt = {
+      explicitCharkey: true
+      , tagNameProcessors: [ xml2js.processors.stripPrefix ]
+    }
+    var files = fs.readdirSync( MSR_DIR )
 
     it ( 'Should not throw exception during xml2js parsing'
       , function () {
-          var opt = {
-            explicitCharkey: true
-            , tagNameProcessors: [ xml2js.processors.stripPrefix ]
-          }
-          var files = fs.readdirSync( MSR_DIR )
           files.forEach( parse )
           function parse( file ) {
             var content = fs.readFileSync( path.join( MSR_DIR, file ) )
@@ -722,11 +722,6 @@ describe( PLUGIN_NAME, function () {
 
     it( 'Should translate multistatus-response xml2js DOMs'
       , function () {
-          var opt = {
-            explicitCharkey: true
-            , tagNameProcessors: [ xml2js.processors.stripPrefix ]
-          }
-          var files = fs.readdirSync( MSR_DIR )
           files.forEach( translate )
           function translate( file ) {
             var content = fs.readFileSync( path.join( MSR_DIR, file ) )
