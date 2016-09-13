@@ -235,7 +235,8 @@ module.exports = function () {
             _put( dest_url, vinyl, _options, resume )
             return
           } else {
-            resume( { statusCode: dest_propfind.stat } )
+            var statusCode = dest_propfind.stat ? dest_propfind.stat : 0
+            resume( { statusCode: statusCode } )
             return
           }
         } else {
