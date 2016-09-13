@@ -698,34 +698,49 @@ describe( PLUGIN_NAME, function () {
 
   } )
 
-  describe( '#rfc2518.tr_207', function ( done ) {
+  describe( '#rfc2518.tr_207', function () {
 
-    it( 'Should parse and translate multistatus response XML content'
-      , function ( done ) {
+    it ( 'Should not throw exception during xml2js parsing'
+      , function () {
+          var opt = {
+            explicitCharkey: true
+            , tagNameProcessors: [ xml2js.processors.stripPrefix ]
+          }
           var files = fs.readdirSync( MSR_DIR )
           files.forEach( parse )
           function parse( file ) {
             var content = fs.readFileSync( path.join( MSR_DIR, file ) )
-            var opt = {
-              explicitCharkey: true
-              , tagNameProcessors: [ xml2js.processors.stripPrefix ]
-            }
-            assert.doesNotThrow( function () {
-              xml2js.parseString( content, opt, function ( err, result ) {
-                assert.ifError( err ) 
-                assert.doesNotThrow( function () {
-                  var propfound = rfc2518.tr_207( result )
-                  assert( propfound, 'tr_207' )
-                  assert( propfound instanceof Array, 'instanceof Array' )
-                  propfound.forEach( function( r ) {
-                    assert( 'href' in r, 'href attribute' )
-                    assert( typeof r.href === 'string' )
-                  } )
-                } )
-              } )
-            }, 'xml2js.parseString' )
+            assert.doesNotThrow(
+                function () {
+                  xml2js.parseString( content, opt )
+                }
+              , file + ': xml2js.parseString call'
+            )
           }
-          done()
+        }
+    )
+
+    it( 'Should translate multistatus-response xml2js DOMs'
+      , function () {
+          var opt = {
+            explicitCharkey: true
+            , tagNameProcessors: [ xml2js.processors.stripPrefix ]
+          }
+          var files = fs.readdirSync( MSR_DIR )
+          files.forEach( translate )
+          function translate( file ) {
+            var content = fs.readFileSync( path.join( MSR_DIR, file ) )
+            xml2js.parseString( content, opt, function ( err, result ) {
+              assert.ifError( err )
+              var propfound = rfc2518.tr_207( result )
+              assert( propfound, 'tr_207 return object' )
+              assert( propfound instanceof Array, 'instanceof Array' )
+              propfound.forEach( function( r ) {
+                assert( 'href' in r, 'href attribute' )
+                assert( typeof r.href === 'string' )
+              } )
+            } )
+          }
     } )
 
   } )
