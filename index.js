@@ -149,7 +149,11 @@ module.exports = function () {
     if ( _options.list === 'dest' ) {
       _propfind( dest_url, 0, _options, function ( res, dom ) {
         if ( res.statusCode === 207 ) {
-          dest_propfind = rfc2518.tr_207( dom )[0]
+          try {
+            dest_propfind = rfc2518.tr_207( dom )[0]
+          } catch ( error ) {
+            _on_error( error )
+          }
           log.var( '$dest_propfind' )
           log.var( ' .getcontentlength', dest_propfind.getcontentlength )
           log.var( ' .getlastmodified', dest_propfind.getlastmodified )
@@ -646,6 +650,10 @@ function _xml_to_url_a( dom ) {
   function href( element ) {
     return element.href
   }
-  return rfc2518.tr_207( dom ).map( href )
+  try {
+    return rfc2518.tr_207( dom ).map( href )
+  } catch ( error ) {
+    _on_error( error )
+  }
 }
 
