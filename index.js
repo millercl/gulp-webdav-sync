@@ -161,7 +161,10 @@ module.exports = function () {
           log.var( ' .resourcetype', dest_propfind.resourcetype )
         }
         if ( res.headers.date ) {
-          server_date = new Date( res.headers.date )
+          var input = new Date( res.headers.date )
+          if ( !isNaN( input.getTime() ) ) {
+            server_date = input
+          }
         }
         init()
       } )
@@ -174,6 +177,9 @@ module.exports = function () {
         return dest_propfind.getlastmodified && vinyl.stat && vinyl.stat.ctime
       }
       function server_is_synchronized() {
+        if ( !server_date  || !Number.isInteger( _options.uselastmodified ) ) {
+          return false
+        }
         var now = new Date()
         var tolerance = _options.uselastmodified
         var interval_end = new Date( server_date.getTime() + tolerance )
