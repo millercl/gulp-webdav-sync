@@ -25,7 +25,7 @@ gulp.task( 'watch', [ '.npmrc' ], function () {
 } )
 
 gulp.task( 'src-test', function () {
-  return gulp.src( [ '*.js', 'test/*.js' ] )
+  return gulp.src( [ '*.js', 'lib/*.js', 'test/*.js' ] )
     .pipe( jshint() )
     .pipe( jshint.reporter( 'jshint-stylish' ) )
     .pipe( jscs() )
