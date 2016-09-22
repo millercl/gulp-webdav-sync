@@ -28,7 +28,8 @@
 ## Similar Projects
 1. [grunt-webdav-sync](https://github.com/avisi/grunt-webdav-sync) for [Grunt](http://www.gruntjs.com).
 2. [webdav-sync](https://github.com/bermi/webdav-sync), a nodejs command line utility.
-3. [curl](https://github.com/curl/curl), a C command line utility for HTTP.
+3. [webdav-fs](https://github.com/perry-mitchell/webdav-fs): node fs wrapper for WebDAV.
+4. [curl](https://github.com/curl/curl), a C command line utility for HTTP.
 ```shell
 curl -T "index.js" http://user:pass@localhost:8000/
 curl -X MKCOL http://user:pass@localhost:8000/dir/
