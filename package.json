@@ -25,6 +25,7 @@
     "gulp": "~3.9.0",
     "gulp-debug": "^2.1.2",
     "gulp-jscs": "^4.0.0",
+    "gulp-jscs-stylish": "^1.4.0",
     "gulp-jshint": "^2.0.1",
     "jsDAV": "~0.3.2",
     "jshint": "^2.9.3",

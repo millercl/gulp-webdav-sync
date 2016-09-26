@@ -5,35 +5,39 @@ var https = require( 'https' )
 var path = require( 'path' )
 var Stream = require( 'stream' )
 if ( !Object.assign ) {
-  Object.defineProperty( Object, 'assign', {
-    configurable: true
-    , enumerable: false
-    , value: function ( dest ) {
-      if ( dest === undefined || dest === null ) {
-        throw new TypeError( 'Cannot convert first argument to object' )
-      }
-      var to = Object( dest )
-      var nextSource
-      for ( var i = 1 ; i < arguments.length ; i++ ) {
-        nextSource = arguments[i]
-        if ( nextSource === undefined || nextSource === null ) {
-          continue
+  Object.defineProperty(
+      Object
+    , 'assign'
+    , {
+        configurable: true
+        , enumerable: false
+        , value: function ( dest ) {
+          if ( dest === undefined || dest === null ) {
+            throw new TypeError( 'Cannot convert first argument to object' )
+          }
+          var to = Object( dest )
+          var nextSource
+          for ( var i = 1 ; i < arguments.length ; i++ ) {
+            nextSource = arguments[i]
+            if ( nextSource === undefined || nextSource === null ) {
+              continue
+            }
+            nextSource = Object( nextSource )
+            var keysArray = Object.keys( Object( nextSource ) )
+            keysArray.forEach( assignKey )
+          }
+          function assignKey( e, i, a ) {
+            var nextKey = a[i]
+            var desc = Object.getOwnPropertyDescriptor( nextSource, nextKey )
+            if ( desc !== undefined && desc.enumerable ) {
+              to[nextKey] = nextSource[nextKey]
+            }
+          }
+          return to
         }
-        nextSource = Object( nextSource )
-        var keysArray = Object.keys( Object( nextSource ) )
-        keysArray.forEach( assignKey )
+        , writable: true
       }
-      function assignKey( e, i, a ) {
-        var nextKey = a[i]
-        var desc = Object.getOwnPropertyDescriptor( nextSource, nextKey )
-        if ( desc !== undefined && desc.enumerable ) {
-          to[nextKey] = nextSource[nextKey]
-        }
-      }
-      return to
-    }
-    , writable: true
-  } )
+  )
 }
 var rfc2518 = require( './lib/rfc2518' )
 var url = require( 'url' )
@@ -147,27 +151,32 @@ module.exports = function () {
     }
     log.var( '$dest_url', _strip_url_auth( dest_url ) )
     if ( _options.list === 'dest' ) {
-      _propfind( dest_url, 0, _options, function ( res, dom ) {
-        if ( res.statusCode === 207 ) {
-          try {
-            dest_propfind = rfc2518.tr_207( dom )[0]
-          } catch ( error ) {
-            _on_error( error )
+      _propfind(
+          dest_url
+        , 0
+        , _options
+        , function ( res, dom ) {
+          if ( res.statusCode === 207 ) {
+            try {
+              dest_propfind = rfc2518.tr_207( dom )[0]
+            } catch ( error ) {
+              _on_error( error )
+            }
+            log.var( '$dest_propfind' )
+            log.var( ' .getcontentlength', dest_propfind.getcontentlength )
+            log.var( ' .getlastmodified', dest_propfind.getlastmodified )
+            log.var( ' .stat', dest_propfind.stat )
+            log.var( ' .resourcetype', dest_propfind.resourcetype )
           }
-          log.var( '$dest_propfind' )
-          log.var( ' .getcontentlength', dest_propfind.getcontentlength )
-          log.var( ' .getlastmodified', dest_propfind.getlastmodified )
-          log.var( ' .stat', dest_propfind.stat )
-          log.var( ' .resourcetype', dest_propfind.resourcetype )
-        }
-        if ( res.headers.date ) {
-          var input = new Date( res.headers.date )
-          if ( !isNaN( input.getTime() ) ) {
-            server_date = input
+          if ( res.headers.date ) {
+            var input = new Date( res.headers.date )
+            if ( !isNaN( input.getTime() ) ) {
+              server_date = input
+            }
           }
+          init()
         }
-        init()
-      } )
+      )
     } else {
       init()
     }
@@ -279,16 +288,20 @@ module.exports = function () {
           , href
           , _options
       )
-      _delete( dest_url, _options, function ( res ) {
-        if ( codes.indexOf( res.statusCode ) === -1 ) {
-          codes.push( res.statusCode )
-        }
-        _info_status( res.statusCode, dest_stem, _options )
-        _info_status_code( codes, _options )
-        if ( callback && typeof callback === 'function' ) {
-          callback()
-        }
-      } )
+      _delete(
+          dest_url
+        , _options
+        , function ( res ) {
+            if ( codes.indexOf( res.statusCode ) === -1 ) {
+              codes.push( res.statusCode )
+            }
+            _info_status( res.statusCode, dest_stem, _options )
+            _info_status_code( codes, _options )
+            if ( callback && typeof callback === 'function' ) {
+              callback()
+            }
+          }
+      )
     } else {
       if ( callback && typeof callback === 'function' ) {
         callback()
@@ -296,39 +309,47 @@ module.exports = function () {
     }
   }
   stream.clean = function ( callback ) {
-    _propfind( href, 1, _options, function ( res, dom ) {
-      var url_paths = _xml_to_url_a( dom )
-      url_paths = url_paths.filter(
-        function ( url_path ) {
-          return url.resolve( href, url_path ) !== href
-        }
-      )
-      function recursive_delete( url_paths ) {
-        if ( url_paths.length > 0 ) {
-          var element = url_paths.pop()
-          _delete( url.resolve( href, element )
-            , _options
-            , function ( res ) {
-                if ( codes.indexOf( res.statusCode ) === -1 ) {
-                  codes.push( res.statusCode )
-                }
-                _info_status( res.statusCode, element, _options )
-                recursive_delete( url_paths )
-              }
+    _propfind(
+        href
+      , 1
+      , _options
+      , function ( res, dom ) {
+          var url_paths = _xml_to_url_a( dom )
+          url_paths = url_paths.filter(
+            function ( url_path ) {
+              return url.resolve( href, url_path ) !== href
+            }
           )
-        } else {
-          _info_status_code( codes, _options )
-          if ( callback ) {
-            callback()
+          function recursive_delete( url_paths ) {
+            if ( url_paths.length > 0 ) {
+              var element = url_paths.pop()
+              _delete( url.resolve( href, element )
+                , _options
+                , function ( res ) {
+                    if ( codes.indexOf( res.statusCode ) === -1 ) {
+                      codes.push( res.statusCode )
+                    }
+                    _info_status( res.statusCode, element, _options )
+                    recursive_delete( url_paths )
+                  }
+              )
+            } else {
+              _info_status_code( codes, _options )
+              if ( callback ) {
+                callback()
+              }
+            }
           }
+          recursive_delete( url_paths )
         }
-      }
-      recursive_delete( url_paths )
-    } )
+    )
   }
-  stream.on( 'finish', function () {
-    _info_status_code( codes, _options )
-  } )
+  stream.on(
+      'finish'
+    , function () {
+        _info_status_code( codes, _options )
+      }
+  )
   return stream
 }
 
@@ -453,7 +474,10 @@ function _info_status( statusCode, string, _options ) {
   var log = new Log( _options )
   var code =
     _colorcode_statusCode_fn( statusCode )
-      .call( this, statusCode )
+      .call(
+          this
+        , statusCode
+      )
   log.info( _gulp_prefix(), code, string )
 }
 
@@ -470,10 +494,16 @@ function _info_code( statusCode, _options ) {
   var log = new Log( _options )
   var code =
     _colorcode_statusCode_fn( statusCode )
-      .call( this, statusCode )
+      .call(
+          this
+        , statusCode
+      )
   var msg =
     _colorcode_statusMessage_fn( statusCode )
-      .call( this, http.STATUS_CODES[statusCode] )
+      .call(
+          this
+        , http.STATUS_CODES[statusCode]
+      )
   log.info( _gulp_prefix(), code, msg )
 }
 
@@ -532,24 +562,37 @@ function _propfind( href, depth, _options, callback ) {
     , { 'headers': { 'Depth': depth } }
   )
   client = _if_tls( options.protocol )
-  req = client.request( options, function ( res ) {
-    var content = ''
-    res.on( 'data', function ( chunk ) {
-      content += chunk
-    } )
-    res.on( 'end', function () {
-      var opt = {
-        explicitCharkey: true
-        , tagNameProcessors: [ xml2js.processors.stripPrefix ]
+  req = client.request(
+      options
+    , function ( res ) {
+        var content = ''
+        res.on(
+            'data'
+          , function ( chunk ) {
+                content += chunk
+              }
+        )
+        res.on(
+            'end'
+          , function () {
+              var opt = {
+                explicitCharkey: true
+                , tagNameProcessors: [ xml2js.processors.stripPrefix ]
+              }
+              xml2js.parseString(
+                  content
+                , opt
+                , function ( err, result ) {
+                    if ( err ) {
+                      _on_error( err )
+                    }
+                    callback( res, result )
+                  }
+              )
+            }
+       )
       }
-      xml2js.parseString( content, opt, function ( err, result ) {
-        if ( err ) {
-          _on_error( err )
-        }
-        callback( res, result )
-      } )
-    } )
-  } )
+  )
   req.on( 'error', _on_error )
   req.end()
 }
@@ -584,9 +627,13 @@ function _proppatch_( href, date, cb ) {
         }
     }
   }
-  _proppatch( href, dom, function ( res ) {
-    cb( res )
-  } )
+  _proppatch(
+      href
+    , dom
+    , function ( res ) {
+        cb( res )
+      }
+  )
 }
 
 function _put( href, vinyl, _options, callback ) {
