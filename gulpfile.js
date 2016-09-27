@@ -13,8 +13,8 @@ gulp.task( 'default', [ 'int-test' ] )
 gulp.task( 'int-test'
 , [ '.npmrc' ]
 , function () {
-  return gulp.src( 'test/assets/**' )
-    .pipe( dav( href, { 'log': 'info', 'base': 'test/assets' } ) )
+  return gulp.src( 'test/assets/int/**' )
+    .pipe( dav( href, { 'log': 'info', 'base': 'test/assets/int/' } ) )
     .pipe( debug( { title: 'post' } ) )
 } )
 
