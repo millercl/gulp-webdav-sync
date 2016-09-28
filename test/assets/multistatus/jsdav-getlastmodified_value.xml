@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<d:multistatus xmlns:d="DAV:" xmlns:a="http://ajax.org/2005/aml">
+
+  <d:response>
+    <d:href>/</d:href>
+    <d:propstat>
+      <d:prop>
+        <d:getlastmodified 
+          xmlns:b="urn:uuid:c2f41010-65b3-11d1-a29f-00aa00c14882/" 
+          b:dt="dateTime.rfc1123"
+          >
+        </d:getlastmodified>
+        <d:resourcetype>
+          <d:collection/>
+        </d:resourcetype>
+      </d:prop>
+      <d:status>HTTP/1.1 200 Ok</d:status>
+    </d:propstat>
+  </d:response>
+
+  <d:response>
+    <d:href>/dir/</d:href>
+    <d:propstat>
+      <d:prop>
+        <d:getlastmodified 
+          xmlns:b="urn:uuid:c2f41010-65b3-11d1-a29f-00aa00c14882/" 
+          b:dt="dateTime.rfc1123"
+          >
+        </d:getlastmodified>
+        <d:resourcetype>
+          <d:collection/>
+        </d:resourcetype>
+      </d:prop>
+      <d:status>HTTP/1.1 200 Ok</d:status>
+    </d:propstat>
+  </d:response>
+
+  <d:response>
+    <d:href>/file</d:href>
+    <d:propstat>
+      <d:prop>
+        <d:getlastmodified 
+          xmlns:b="urn:uuid:c2f41010-65b3-11d1-a29f-00aa00c14882/" 
+          b:dt="dateTime.rfc1123"
+          >
+        </d:getlastmodified>
+        <d:getcontentlength>4</d:getcontentlength>
+        <d:resourcetype>
+        </d:resourcetype>
+        <d:getcontenttype>application/octet-stream</d:getcontenttype>
+      </d:prop>
+      <d:status>HTTP/1.1 200 Ok</d:status>
+    </d:propstat>
+  </d:response>
+
+</d:multistatus>

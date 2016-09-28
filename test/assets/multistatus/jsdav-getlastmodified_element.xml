@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<d:multistatus xmlns:d="DAV:" xmlns:a="http://ajax.org/2005/aml">
+
+  <d:response>
+    <d:href>/</d:href>
+    <d:propstat>
+      <d:prop>
+        <d:resourcetype>
+          <d:collection/>
+        </d:resourcetype>
+      </d:prop>
+      <d:status>HTTP/1.1 200 Ok</d:status>
+    </d:propstat>
+  </d:response>
+
+  <d:response>
+    <d:href>/dir/</d:href>
+    <d:propstat>
+      <d:prop>
+        <d:resourcetype>
+          <d:collection/>
+        </d:resourcetype>
+      </d:prop>
+      <d:status>HTTP/1.1 200 Ok</d:status>
+    </d:propstat>
+  </d:response>
+
+  <d:response>
+    <d:href>/file</d:href>
+    <d:propstat>
+      <d:prop>
+        <d:getcontentlength>4</d:getcontentlength>
+        <d:resourcetype>
+        </d:resourcetype>
+        <d:getcontenttype>application/octet-stream</d:getcontenttype>
+      </d:prop>
+      <d:status>HTTP/1.1 200 Ok</d:status>
+    </d:propstat>
+  </d:response>
+
+</d:multistatus>
