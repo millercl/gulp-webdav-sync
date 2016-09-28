@@ -21,9 +21,9 @@ const MOCK = 'mock'
 const MSR_DIR = './test/assets/multistatus/'
 const TEMP = 'tmp'
 const TLS_PORT = 8443
-const CA_CERT = './test/assets/certs/ca.pem'
-const SRV_CERT = './test/assets/certs/localhost.pem'
-const SRV_KEY = './test/assets/private/localhost.pem'
+const CA_CERT = './test/assets/openssl/certs/ca.pem'
+const SRV_CERT = './test/assets/openssl/certs/localhost.pem'
+const SRV_KEY = './test/assets/openssl/private/localhost.pem'
 
 describe( PLUGIN_NAME
   , function () {

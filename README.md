@@ -262,7 +262,7 @@ Set to false to disable.
 ```shell
 cd gulp-webdav-sync
 npm install
-pushd test/assets
+pushd test/assets/openssl
 ./rekey.sh
 popd
 npm test
