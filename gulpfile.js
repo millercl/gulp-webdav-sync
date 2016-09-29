@@ -1,4 +1,5 @@
 var debug = require( 'gulp-debug' )
+var del = require( 'del' )
 var dav = require( './index.js' )
 var gulp = require( 'gulp' )
 var jscs = require( 'gulp-jscs' )
@@ -53,3 +54,32 @@ gulp.task( '.npmrc'
     cb()
   } )
 } )
+
+gulp.task(
+    'clean-ca'
+  , function () {
+      /*
+    mkdir -p certs
+    mkdir -p crl
+    mkdir -p newcerts
+    mkdir -p private
+    mkdir -p pkcs10
+    rm -f index.txt*
+    rm -f index.txt.attr*
+    rm -f serial*
+    rm -f newcerts/* */
+      var ca = [
+          'test/assets/openssl/index.txt*'
+        , 'test/assets/openssl/index.attr.txt*'
+        , 'test/assets/openssl/serial*'
+        , 'test/assets/openssl/newcerts/*'
+        , 'test/assets/openssl/certs'
+        , 'test/assets/openssl/crl'
+        , 'test/assets/openssl/newcerts'
+        , 'test/assets/openssl/private'
+        , 'test/assets/openssl/pkcs10'
+      ]
+      del( ca )
+    }
+)
+
