@@ -259,6 +259,8 @@ Set to false to disable.
 **Default:** `1000` ms
 
 ## Development
+[OpenSSL](https://github.com/openssl/openssl) is required to generate certificates for unit testing.
+
 ```shell
 cd gulp-webdav-sync
 npm install
