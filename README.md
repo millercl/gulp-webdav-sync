@@ -264,9 +264,6 @@ Set to false to disable.
 ```shell
 cd gulp-webdav-sync
 npm install
-pushd test/assets/openssl
-./rekey.sh
-popd
 npm test
 npm set dav http://user:pass@localhost:8000/
 gulp

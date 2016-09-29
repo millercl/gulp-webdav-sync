@@ -18,10 +18,12 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha",
-    "posttest": "gulp src-test"
+    "posttest": "gulp src-test",
+    "prepublish": "node prepublish"
   },
   "devDependencies": {
     "del": "^2.2.2",
+    "fs-extra": "^0.30.0",
     "gulp": "~3.9.0",
     "gulp-debug": "^2.1.2",
     "gulp-jscs": "^4.0.0",
