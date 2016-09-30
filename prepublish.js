@@ -1,12 +1,11 @@
 var child_process = require( 'child_process' )
 var del = require( 'del' )
 var fs = require( 'fs-extra' )
+var npmlog = require( 'npmlog' )
 var path = require( 'path' )
-var process = require( 'process' )
 
 const PATH = 'test/assets/openssl/'
 
-console.log( process.cwd() )
 if ( !creds_exist() ) {
   rekey()
 }
@@ -66,7 +65,8 @@ function rekey() {
   fs.ensureFileSync( path_join( 'index.txt' ) )
   fs.ensureFileSync( path_join( 'index.txt.attr' ) )
   var opt = { stdio: [ null, 'inherit', 'inherit'] }
-  child_process.spawnSync(
+  var last
+  last = child_process.spawnSync(
       'openssl'
     , [
           'genrsa'
@@ -76,7 +76,10 @@ function rekey() {
       ]
     , opt
   )
-  child_process.spawnSync(
+  if ( last.status !== 0 ) {
+    npmlog.warn( 'prepublish.js', 'openssl error', last )
+  }
+  last = child_process.spawnSync(
       'openssl'
     , [
           'req'
@@ -93,7 +96,10 @@ function rekey() {
       ]
     , opt
   )
-  child_process.spawnSync(
+  if ( last.status !== 0 ) {
+    npmlog.warn( 'prepublish.js', 'openssl error', last )
+  }
+  last = child_process.spawnSync(
       'openssl'
     , [
           'ca'
@@ -113,7 +119,10 @@ function rekey() {
       ]
     , opt
   )
-  var ca = child_process.spawnSync(
+  if ( last.status !== 0 ) {
+    npmlog.warn( 'prepublish.js', 'openssl error', last )
+  }
+  last = child_process.spawnSync(
       'openssl'
     , [
           'verify'
@@ -123,7 +132,10 @@ function rekey() {
       ]
     , opt
   )
-  child_process.spawnSync(
+  if ( last.status !== 0 ) {
+    npmlog.warn( 'prepublish.js', 'openssl error', last )
+  }
+  last = child_process.spawnSync(
       'openssl'
     , [
           'genrsa'
@@ -133,7 +145,10 @@ function rekey() {
       ]
     , opt
   )
-  child_process.spawnSync(
+  if ( last.status !== 0 ) {
+    npmlog.warn( 'prepublish.js', 'openssl error', last )
+  }
+  last = child_process.spawnSync(
       'openssl'
     , [
           'req'
@@ -150,7 +165,10 @@ function rekey() {
       ]
     , opt
   )
-  child_process.spawnSync(
+  if ( last.status !== 0 ) {
+    npmlog.warn( 'prepublish.js', 'openssl error', last )
+  }
+  last = child_process.spawnSync(
       'openssl'
     , [
           'ca'
@@ -168,7 +186,10 @@ function rekey() {
     ]
     , opt
   )
-  var lh = child_process.spawnSync(
+  if ( last.status !== 0 ) {
+    npmlog.warn( 'prepublish.js', 'openssl error', last )
+  }
+  last = child_process.spawnSync(
       'openssl'
     , [
           'verify'
@@ -178,4 +199,7 @@ function rekey() {
       ]
     , opt
   )
+  if ( last.status !== 0 ) {
+    npmlog.warn( 'prepublish.js', 'openssl error', last )
+  }
 }
