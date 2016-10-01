@@ -316,7 +316,10 @@ module.exports = function () {
       _delete(
           dest_url
         , _options
-        , function ( res ) {
+        , function ( err, res, cnt ) {
+            if ( err && !res ) {
+              res = err
+            }
             if ( codes.indexOf( res.statusCode ) === -1 ) {
               codes.push( res.statusCode )
             }
@@ -350,7 +353,10 @@ module.exports = function () {
               var element = url_paths.pop()
               _delete( url.resolve( href, element )
                 , _options
-                , function ( res ) {
+                , function ( err, res, cnt ) {
+                    if ( err && !res ) {
+                      res = err
+                    }
                     if ( codes.indexOf( res.statusCode ) === -1 ) {
                       codes.push( res.statusCode )
                     }
@@ -437,15 +443,14 @@ function _colorcode_statusMessage_fn( statusMessage ) {
 }
 
 function _delete( href, _options, callback ) {
-  var options, req, client
+  var options, req
   options = Object.assign(
       {}
+    , { url: href }
     , _options
-    , url.parse( href )
     , { method: 'DELETE' }
   )
-  client = _if_tls( options.protocol )
-  req = client.request( options, callback )
+  req = request( options, callback )
   req.on( 'error', _on_error )
   req.end()
 }
