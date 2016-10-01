@@ -281,7 +281,10 @@ module.exports = function () {
       callback( null, vinyl )
     }
 
-    function resume( res ) {
+    function resume( err, res, cnt ) {
+      if ( err && !res ) {
+        res = err
+      }
       if ( res ) {
         if ( codes.indexOf( res.statusCode ) === -1 ) {
           codes.push( res.statusCode )
@@ -654,15 +657,14 @@ function _proppatch_( href, date, cb ) {
 }
 
 function _put( href, vinyl, _options, callback ) {
-  var options, req, client
+  var options, req
   options = Object.assign(
       {}
+    , { url: href }
     , _options
-    , url.parse( href )
     , { method: 'PUT' }
   )
-  client = _if_tls( options.protocol )
-  req = client.request( options, callback )
+  req = request( options, callback )
   req.on( 'error', _on_error )
   if ( vinyl.isBuffer() ) {
     req.write( vinyl.contents
