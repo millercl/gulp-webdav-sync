@@ -466,14 +466,14 @@ function _filter_collection( resrc ) {
 }
 
 function _get( href, _options, callback ) {
-  var options, req, client
+  var options, req
   options = Object.assign(
       {}
+    , { url: href }
     , _options
     , url.parse( href )
   )
-  client = _if_tls( options.protocol )
-  req = client.request( options, callback )
+  req = request( options, callback )
   req.on( 'error', _on_error )
   req.end()
 }
