@@ -124,7 +124,7 @@ describe( PLUGIN_NAME
                         unit.write( mock, null, validate )
                         unit.end()
                       }
-                    , /not supported/
+                    , /Invalid protocol/
                   )
                   validate()
                   function validate() {

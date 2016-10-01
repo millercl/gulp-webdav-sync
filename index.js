@@ -180,7 +180,7 @@ module.exports = function () {
           dest_url
         , 0
         , _options
-        , function ( res, dom ) {
+        , function ( err, res, dom ) {
           if ( res.statusCode === 207 ) {
             try {
               dest_propfind = rfc2518.tr_207( dom )[0]
@@ -341,7 +341,7 @@ module.exports = function () {
         href
       , 1
       , _options
-      , function ( res, dom ) {
+      , function ( err, res, dom ) {
           var url_paths = _xml_to_url_a( dom )
           url_paths = url_paths.filter(
             function ( url_path ) {
@@ -582,46 +582,34 @@ function _on_error( error ) {
 }
 
 function _propfind( href, depth, _options, callback ) {
-  var options, req, client
+  var options, req
   options = Object.assign(
       {}
+    , { url: href }
     , _options
-    , url.parse( href )
     , { method: 'PROPFIND' }
     , { 'headers': { 'Depth': depth } }
   )
-  client = _if_tls( options.protocol )
-  req = client.request(
-      options
-    , function ( res ) {
-        var content = ''
-        res.on(
-            'data'
-          , function ( chunk ) {
-                content += chunk
-              }
-        )
-        res.on(
-            'end'
-          , function () {
-              var opt = {
-                explicitCharkey: true
-                , tagNameProcessors: [ xml2js.processors.stripPrefix ]
-              }
-              xml2js.parseString(
-                  content
-                , opt
-                , function ( err, result ) {
-                    if ( err ) {
-                      _on_error( err )
-                    }
-                    callback( res, result )
-                  }
-              )
-            }
-       )
-      }
-  )
+  function parse( err, res, content ) {
+    if ( err ) {
+      _on_error( err )
+    }
+    var opt = {
+      explicitCharkey: true
+      , tagNameProcessors: [ xml2js.processors.stripPrefix ]
+    }
+    xml2js.parseString(
+        content
+      , opt
+      , function ( err, result ) {
+          if ( err ) {
+            _on_error( err )
+          }
+          callback( err, res, result )
+        }
+    )
+  }
+  req = request( options, parse )
   req.on( 'error', _on_error )
   req.end()
 }
