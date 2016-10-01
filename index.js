@@ -63,6 +63,7 @@ if ( !Object.assign ) {
       }
   )
 }
+var request = require( 'request' )
 var rfc2518 = require( './lib/rfc2518' )
 var url = require( 'url' )
 var xml2js = require( 'xml2js' )
@@ -559,15 +560,14 @@ var Log = function ( _options ) {
 }
 
 function _mkcol( href, _options, callback ) {
-  var options, req, client
+  var options, req
   options = Object.assign(
       {}
+    , { url: href }
     , _options
-    , url.parse( href )
     , { method: 'MKCOL' }
   )
-  client = _if_tls( options.client )
-  req = client.request( options, callback )
+  req = request( options, callback )
   req.on( 'error', _on_error )
   req.end()
 }
