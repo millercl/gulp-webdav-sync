@@ -2,7 +2,7 @@
 default_ca = CA_default
 
 [ CA_default ]
-dir          	= .
+dir          	= test/assets/openssl
 certs	        = $dir/certs
 crl_dir	      = $dir/crl
 database      = $dir/index.txt
