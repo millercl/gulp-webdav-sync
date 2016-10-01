@@ -621,13 +621,13 @@ function _proppatch( href, props, _options, callback ) {
   var options, xml, req
   options = Object.assign(
       {}
+    , { url: href }
     , _options
-    , url.parse( href )
     , { method: 'PROPPATCH' }
     , { headers: { 'Content-Type': 'text/xml; charset="utf-8"' } }
   )
   xml = ( new xml2js.Builder() ).buildObject( props )
-  req = http.request( options, callback )
+  req = request( options, callback )
   req.on( 'error', _on_error )
   req.write( xml )
   req.end()
@@ -650,8 +650,8 @@ function _proppatch_( href, date, cb ) {
   _proppatch(
       href
     , dom
-    , function ( res ) {
-        cb( res )
+    , function ( err, res, cnt ) {
+        cb( err, res, cnt )
       }
   )
 }
