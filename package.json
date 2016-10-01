@@ -41,6 +41,7 @@
   "dependencies": {
     "chalk": "~1.1.0",
     "gulp-util": "~3.0.6",
+    "request": "^2.9.153",
     "xml2js": "^0.4.17"
   },
   "homepage": "https://github.com/millercl/gulp-webdav-sync#readme",
