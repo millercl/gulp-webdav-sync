@@ -287,7 +287,7 @@ module.exports = function () {
         }
         _info_status( res.statusCode, dest_stem, _options )
       }
-      callback()
+      callback( null, vinyl )
     }
 
   }
