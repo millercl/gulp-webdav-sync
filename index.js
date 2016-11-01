@@ -1,3 +1,27 @@
+// gulp-webdav-sync, a webdav client as a gulp plugin
+// Copyright (C) 2016 by Christopher Miller
+
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+// Additional permision is granted to reference this software
+// by name and version from within other works without requiring
+// such works to adopt the GNU General Public License, so long as
+// such works do not require this software for mere user operation
+// of such works. That is, you may require this software as a
+// "devDependency" in your package.json without creating a new work
+// in which this software is a necessary component.
+
 var chalk = require( 'chalk' )
 var gutil = require( 'gulp-util' )
 var http = require( 'http' )
