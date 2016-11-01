@@ -153,6 +153,7 @@ gulp.task( 'load-npmrc', function ( cb ) {
 It re-emits created, modified, and deleted files.
 Delete/`'unlink'` type events are attempted on the server as well.
 ```js
+var browserSync = require( 'browser-sync' ).create()
 var watch = require( 'gulp-watch' )
 var webdav = require( 'gulp-webdav-sync' )
 var paths = {
@@ -161,9 +162,11 @@ var paths = {
 var href = 'http://localhost'
 
 gulp.task( 'deploy', function () {
+  browserSync.init( { proxy: href } )
   return gulp.src( paths.js )
     .pipe( watch( paths.js ) )
-    .pipe( webdav( href ) )
+    .pipe( webdav( href, { log: 'info' } ) )
+    .pipe( browserSync.stream() )
 } )
 ```
 
