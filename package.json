@@ -23,7 +23,7 @@
   },
   "devDependencies": {
     "del": "^2.2.2",
-    "fs-extra": "^0.30.0",
+    "fs-extra": "^2.1.2",
     "gulp": "~3.9.0",
     "gulp-debug": "^3.1.0",
     "gulp-jscs": "^4.0.0",
