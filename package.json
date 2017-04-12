@@ -25,7 +25,7 @@
     "del": "^2.2.2",
     "fs-extra": "^0.30.0",
     "gulp": "~3.9.0",
-    "gulp-debug": "^2.1.2",
+    "gulp-debug": "^3.1.0",
     "gulp-jscs": "^4.0.0",
     "gulp-jscs-stylish": "^1.4.0",
     "gulp-jshint": "^2.0.1",
