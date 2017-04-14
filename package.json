@@ -1,6 +1,6 @@
 {
   "name": "gulp-webdav-sync",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Deploy files and folders via WebDAV",
   "repository": {
     "type": "git",
@@ -36,7 +36,7 @@
     "mocha": "^3.0.2",
     "npmconf": "~2.1.2",
     "npmlog": "^4.0.0",
-    "vinyl": "^1.2.0"
+    "vinyl": "^2.0.1"
   },
   "dependencies": {
     "chalk": "~1.1.0",
