@@ -670,8 +670,19 @@ function _put( href, vinyl, _options, callback ) {
   )
   client = _if_tls( options.protocol )
   req = client.request( options, callback )
-  vinyl.pipe( req )
   req.on( 'error', _on_error )
+  if ( vinyl.isBuffer() ) {
+    req.write( vinyl.contents
+      , function () {
+          req.end()
+        }
+    )
+  }
+  else
+ if ( vinyl.isStream() ) {
+    vinyl.contents.pipe( req )
+  }
+
 }
 
 function _splice_dest( vinyl_path, base_dir, href, _options ) {

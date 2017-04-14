@@ -1,10 +1,10 @@
 {
   "name": "gulp-webdav-sync",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Deploy files and folders via WebDAV",
   "repository": {
     "type": "git",
-    "url": "https://github.com/millercl/gulp-webdav-sync.git"
+    "url": "git+https://github.com/millercl/gulp-webdav-sync.git"
   },
   "bugs": {
     "url": "https://github.com/millercl/gulp-webdav-sync/issues"
@@ -23,9 +23,9 @@
   },
   "devDependencies": {
     "del": "^2.2.2",
-    "fs-extra": "^0.30.0",
+    "fs-extra": "^2.1.2",
     "gulp": "~3.9.0",
-    "gulp-debug": "^2.1.2",
+    "gulp-debug": "^3.1.0",
     "gulp-jscs": "^4.0.0",
     "gulp-jscs-stylish": "^1.4.0",
     "gulp-jshint": "^2.0.1",
@@ -36,11 +36,16 @@
     "mocha": "^3.0.2",
     "npmconf": "~2.1.2",
     "npmlog": "^4.0.0",
-    "vinyl": "^1.2.0"
+    "vinyl": "^2.0.1"
   },
   "dependencies": {
     "chalk": "~1.1.0",
     "gulp-util": "~3.0.6",
     "xml2js": "^0.4.17"
-  }
+  },
+  "homepage": "https://github.com/millercl/gulp-webdav-sync#readme",
+  "directories": {
+    "test": "test"
+  },
+  "author": "Christopher Miller <cmill4ed@mail.umw.edu>"
 }
