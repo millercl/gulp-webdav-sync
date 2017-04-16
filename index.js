@@ -603,16 +603,21 @@ function _propfind( href, depth, _options, callback ) {
                 explicitCharkey: true
                 , tagNameProcessors: [ xml2js.processors.stripPrefix ]
               }
-              xml2js.parseString(
-                  content
-                , opt
-                , function ( err, result ) {
-                    if ( err ) {
-                      _on_error( err )
+              if ( res.statusCode != 404 ) {
+                xml2js.parseString(
+                    content
+                  , opt
+                  , function ( err, result ) {
+                      if ( err ) {
+                        _on_error( err )
+                      }
+                      callback( res, result )
                     }
-                    callback( res, result )
-                  }
-              )
+                )
+              }
+              else {
+                callback( res, undefined )
+              }
             }
        )
       }
