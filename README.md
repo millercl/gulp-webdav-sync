@@ -30,11 +30,11 @@
 3. [webdav-fs](https://github.com/perry-mitchell/webdav-fs): node fs wrapper for WebDAV.
 4. [curl](https://github.com/curl/curl), a C command line utility for HTTP.
 ```shell
-curl -T "index.js" http://user:pass@localhost:8000/
-curl -X MKCOL http://user:pass@localhost:8000/dir/
+curl -T "index.js" http://<user>:<pass>@localhost:8000/
+curl -X MKCOL http://<user>:<pass>@localhost:8000/dir/
 ```
 
-## Destinations 
+## Destinations
 Pass a URL argument indicating a directory/collection on a WebDAV server. Include any HTTP Basic authentication inline. HTTPS authentication must go in the options argument. [`gulp.dest()`](https://github.com/gulpjs/gulp/blob/master/docs/API.md#gulpdestpath-options) is only for the filesystem. Instead, pipe to this module, where the stream objects are consumed.
 ### URL as String
 ```js
@@ -43,33 +43,36 @@ var webdav = require( 'gulp-webdav-sync' )
 // put index.js to http://localhost:8000/js/index.js
 gulp.task( 'deploy', function () {
   return gulp.src( 'index.js' )
-    .pipe( webdav( 'http://user:pass@localhost:8000/js/' ) )
+    .pipe( webdav( 'http://<user>:<pass>@localhost:8000/js/' ) )
 } )
 ```
 ### URL as Object
-Extend a [URL object](https://nodejs.org/api/url.html#url_url_format_urlobj).
+Extend a [request options object](https://github.com/request/request#requestoptions-callback).
+See request's documention for [HTTP authentication](https://github.com/request/request#http-authentication), and [TLS authentication/verification](https://github.com/request/request#tlsssl-protocol).
 ```js
 var webdav = require( 'gulp-webdav-sync' )
 
 // put index.js to http://localhost:8000/js/index.js
-// show status codes
-// show credentials in urls
 gulp.task( 'deploy', function () {
   var options = {
       protocol: 'http:'
-    , auth: 'user:pass'
+    , auth: {
+          'user': '<user>'
+        , 'pass': '<pass>'
+        , 'sendImmediately': false // use http digest authentication
+      }
     , hostname: 'localhost'
     , port: 8000
     , pathname: '/js/'
-    , log: 'info'
-    , logAuth: true
+    , log: 'info' // show status codes
+    , logAuth: true // show credentials in urls
   }
   return gulp.src( 'index.js' )
     .pipe( webdav( options ) )
 } )
 ```
 ### Subdirectories
-Suppose the following directory tree, 
+Suppose the following directory tree,
  * project/
    * dist/
      * css/
@@ -205,7 +208,7 @@ Optional, asynchronous, callback function.
 **Default:** `undefined`
 
 #### options
-Superset of [http.request options parameter](https://nodejs.org/api/http.html#http_http_request_options_callback), [https.request options parameter](https://nodejs.org/api/https.html#https_https_request_options_callback), and [url.object](https://nodejs.org/api/url.html#url_url_format_urlobj). If any URL properties are defined, then `protocol`, `hostname`, and `pathname` are assigned to `http://localhost/`.
+Superset of [request options parameter](https://github.com/request/request#requestoptions-callback). If any URL properties are defined, then `protocol`, `hostname`, and `pathname` are assigned to `http://localhost/`.
 If `options.agent` is `undefined`, then a http[s] agent will be created for the stream.
 
 **Type:** `Object`</br>
