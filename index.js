@@ -492,17 +492,6 @@ function _gulp_prefix() {
     .join( ' ' )
 }
 
-function _if_tls( scheme ) {
-  switch ( scheme ) {
-    case 'http:':
-      return http
-    case 'https:':
-      return https
-    default:
-      return http
-  }
-}
-
 function _info_status( statusCode, string, _options ) {
   var log = new Log( _options )
   var code =
