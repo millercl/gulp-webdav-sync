@@ -1,5 +1,5 @@
 // gulp-webdav-sync, a webdav client as a gulp plugin
-// Copyright (C) 2016 by Christopher Miller
+// Copyright (C) 2016, 2017 by Christopher Miller
 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
