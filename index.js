@@ -25,7 +25,6 @@
 var chalk = require( 'chalk' )
 var gutil = require( 'gulp-util' )
 var http = require( 'http' )
-var https = require( 'https' )
 var path = require( 'path' )
 var Stream = require( 'stream' )
 if ( !Object.assign ) {
@@ -125,12 +124,6 @@ module.exports = function () {
   }
   var log = new Log( _options )
   _info_dest( href, _options )
-  if ( _options.agent === undefined ) {
-    var agent = url.parse( href ).protocol === 'https:'
-      ? new https.Agent( _options )
-      : new http.Agent( { 'keepAlive': true } )
-    _options.agent = agent
-  }
   function filter_on_href( list, urlpath ) {
     return list
       .filter( function ( element ) {
@@ -490,17 +483,6 @@ function _gulp_prefix() {
     .concat( Array.prototype.slice.call( arguments ) )
     .map( bracket )
     .join( ' ' )
-}
-
-function _if_tls( scheme ) {
-  switch ( scheme ) {
-    case 'http:':
-      return http
-    case 'https:':
-      return https
-    default:
-      return http
-  }
 }
 
 function _info_status( statusCode, string, _options ) {
