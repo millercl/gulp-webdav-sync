@@ -35,7 +35,7 @@ curl -X MKCOL http://<user>:<pass>@localhost:8000/dir/
 ```
 
 ## Destinations
-Pass a URL argument indicating a directory/collection on a WebDAV server. Include any HTTP Basic authentication inline. HTTPS authentication must go in the options argument. [`gulp.dest()`](https://github.com/gulpjs/gulp/blob/master/docs/API.md#gulpdestpath-options) is only for the filesystem. Instead, pipe to this module, where the stream objects are consumed.
+Pass a URL argument indicating a directory/collection on a WebDAV server. Include any HTTP authentication inline or in the options argument. HTTPS authentication must go in the options argument. Pipe to this module instead of [`gulp.dest()`](https://github.com/gulpjs/gulp/blob/master/docs/API.md#gulpdestpath-options).
 ### URL as String
 ```js
 var webdav = require( 'gulp-webdav-sync' )
@@ -271,6 +271,6 @@ Set to false to disable.
 cd gulp-webdav-sync
 npm install
 npm test
-npm set dav http://user:pass@localhost:8000/
+npm set dav http://<user>:<pass>@localhost:8000/
 gulp
 ```
