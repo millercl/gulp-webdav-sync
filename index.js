@@ -1,5 +1,5 @@
 // gulp-webdav-sync, a webdav client as a gulp plugin
-// Copyright (C) 2016 by Christopher Miller
+// Copyright (C) 2016, 2017 by Christopher Miller
 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -63,6 +63,7 @@ if ( !Object.assign ) {
       }
   )
 }
+var request = require( 'request' )
 var rfc2518 = require( './lib/rfc2518' )
 var url = require( 'url' )
 var xml2js = require( 'xml2js' )
@@ -179,7 +180,7 @@ module.exports = function () {
           dest_url
         , 0
         , _options
-        , function ( res, dom ) {
+        , function ( err, res, dom ) {
           if ( res.statusCode === 207 ) {
             try {
               dest_propfind = rfc2518.tr_207( dom )[0]
@@ -280,7 +281,10 @@ module.exports = function () {
       callback( null, vinyl )
     }
 
-    function resume( res ) {
+    function resume( err, res, cnt ) {
+      if ( err && !res ) {
+        res = err
+      }
       if ( res ) {
         if ( codes.indexOf( res.statusCode ) === -1 ) {
           codes.push( res.statusCode )
@@ -315,7 +319,10 @@ module.exports = function () {
       _delete(
           dest_url
         , _options
-        , function ( res ) {
+        , function ( err, res, cnt ) {
+            if ( err && !res ) {
+              res = err
+            }
             if ( codes.indexOf( res.statusCode ) === -1 ) {
               codes.push( res.statusCode )
             }
@@ -337,7 +344,7 @@ module.exports = function () {
         href
       , 1
       , _options
-      , function ( res, dom ) {
+      , function ( err, res, dom ) {
           var url_paths = _xml_to_url_a( dom )
           url_paths = url_paths.filter(
             function ( url_path ) {
@@ -349,7 +356,10 @@ module.exports = function () {
               var element = url_paths.pop()
               _delete( url.resolve( href, element )
                 , _options
-                , function ( res ) {
+                , function ( err, res, cnt ) {
+                    if ( err && !res ) {
+                      res = err
+                    }
                     if ( codes.indexOf( res.statusCode ) === -1 ) {
                       codes.push( res.statusCode )
                     }
@@ -436,15 +446,14 @@ function _colorcode_statusMessage_fn( statusMessage ) {
 }
 
 function _delete( href, _options, callback ) {
-  var options, req, client
+  var options, req
   options = Object.assign(
       {}
+    , { url: href }
     , _options
-    , url.parse( href )
     , { method: 'DELETE' }
   )
-  client = _if_tls( options.protocol )
-  req = client.request( options, callback )
+  req = request( options, callback )
   req.on( 'error', _on_error )
   req.end()
 }
@@ -457,14 +466,14 @@ function _filter_collection( resrc ) {
 }
 
 function _get( href, _options, callback ) {
-  var options, req, client
+  var options, req
   options = Object.assign(
       {}
+    , { url: href }
     , _options
     , url.parse( href )
   )
-  client = _if_tls( options.protocol )
-  req = client.request( options, callback )
+  req = request( options, callback )
   req.on( 'error', _on_error )
   req.end()
 }
@@ -481,17 +490,6 @@ function _gulp_prefix() {
     .concat( Array.prototype.slice.call( arguments ) )
     .map( bracket )
     .join( ' ' )
-}
-
-function _if_tls( scheme ) {
-  switch ( scheme ) {
-    case 'http:':
-      return http
-    case 'https:':
-      return https
-    default:
-      return http
-  }
 }
 
 function _info_status( statusCode, string, _options ) {
@@ -559,15 +557,14 @@ var Log = function ( _options ) {
 }
 
 function _mkcol( href, _options, callback ) {
-  var options, req, client
+  var options, req
   options = Object.assign(
       {}
+    , { url: href }
     , _options
-    , url.parse( href )
     , { method: 'MKCOL' }
   )
-  client = _if_tls( options.client )
-  req = client.request( options, callback )
+  req = request( options, callback )
   req.on( 'error', _on_error )
   req.end()
 }
@@ -577,46 +574,34 @@ function _on_error( error ) {
 }
 
 function _propfind( href, depth, _options, callback ) {
-  var options, req, client
+  var options, req
   options = Object.assign(
       {}
+    , { url: href }
     , _options
-    , url.parse( href )
     , { method: 'PROPFIND' }
     , { 'headers': { 'Depth': depth } }
   )
-  client = _if_tls( options.protocol )
-  req = client.request(
-      options
-    , function ( res ) {
-        var content = ''
-        res.on(
-            'data'
-          , function ( chunk ) {
-                content += chunk
-              }
-        )
-        res.on(
-            'end'
-          , function () {
-              var opt = {
-                explicitCharkey: true
-                , tagNameProcessors: [ xml2js.processors.stripPrefix ]
-              }
-              xml2js.parseString(
-                  content
-                , opt
-                , function ( err, result ) {
-                    if ( err ) {
-                      _on_error( err )
-                    }
-                    callback( res, result )
-                  }
-              )
-            }
-       )
-      }
-  )
+  function parse( err, res, content ) {
+    if ( err ) {
+      _on_error( err )
+    }
+    var opt = {
+      explicitCharkey: true
+      , tagNameProcessors: [ xml2js.processors.stripPrefix ]
+    }
+    xml2js.parseString(
+        content
+      , opt
+      , function ( err, result ) {
+          if ( err ) {
+            _on_error( err )
+          }
+          callback( err, res, result )
+        }
+    )
+  }
+  req = request( options, parse )
   req.on( 'error', _on_error )
   req.end()
 }
@@ -625,13 +610,13 @@ function _proppatch( href, props, _options, callback ) {
   var options, xml, req
   options = Object.assign(
       {}
+    , { url: href }
     , _options
-    , url.parse( href )
     , { method: 'PROPPATCH' }
     , { headers: { 'Content-Type': 'text/xml; charset="utf-8"' } }
   )
   xml = ( new xml2js.Builder() ).buildObject( props )
-  req = http.request( options, callback )
+  req = request( options, callback )
   req.on( 'error', _on_error )
   req.write( xml )
   req.end()
@@ -654,22 +639,21 @@ function _proppatch_( href, date, cb ) {
   _proppatch(
       href
     , dom
-    , function ( res ) {
-        cb( res )
+    , function ( err, res, cnt ) {
+        cb( err, res, cnt )
       }
   )
 }
 
 function _put( href, vinyl, _options, callback ) {
-  var options, req, client
+  var options, req
   options = Object.assign(
       {}
+    , { url: href }
     , _options
-    , url.parse( href )
     , { method: 'PUT' }
   )
-  client = _if_tls( options.protocol )
-  req = client.request( options, callback )
+  req = request( options, callback )
   req.on( 'error', _on_error )
   if ( vinyl.isBuffer() ) {
     req.write( vinyl.contents

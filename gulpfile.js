@@ -1,5 +1,5 @@
 // gulp-webdav-sync, a webdav client as a gulp plugin
-// Copyright (C) 2016 by Christopher Miller
+// Copyright (C) 2016, 2017 by Christopher Miller
 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -25,12 +25,18 @@
 var debug = require( 'gulp-debug' )
 var del = require( 'del' )
 var dav = require( './index.js' )
+var fs = require( 'fs' )
 var gulp = require( 'gulp' )
 var jscs = require( 'gulp-jscs' )
+var jsdav = require( 'jsDAV' )
+var jsdav_locks = require( 'jsDAV/lib/DAV/plugins/locks/fs' )
+var jsdav_authc = require( 'jsDAV/lib/DAV/plugins/auth/file' )
 var jshint = require( 'gulp-jshint' )
 var npmconf = require( 'npmconf' )
+var process = require( 'process' )
 var stylish_jshint = require( 'jshint-stylish' )
 var stylish_jscs = require( 'gulp-jscs-stylish' )
+var url = require( 'url' )
 
 var href
 gulp.task( 'default', [ 'int-test' ] )
@@ -107,3 +113,32 @@ gulp.task(
     }
 )
 
+gulp.task(
+    'jsdav-digest'
+  , function ( done ) {
+      var uri = url.parse( 'http://localhost:11280/' )
+      var node = 'test/assets/'
+      var htdigest = 'test/assets/.htdigest'
+      var realm =
+        fs
+          .readFileSync( htdigest )
+          .toString()
+          .split( '\n' )[0]
+          .split( ':' )[1]
+      var opt = {
+            node: node
+            , locksBackend: jsdav_locks.new( node )
+            , authBackend: jsdav_authc.new( htdigest )
+            , realm: realm
+          }
+      var srv = jsdav.mount( opt )
+      srv.listen(
+          uri.port
+        , uri.hostname
+        , function () {
+            gulp
+              .watch( node )
+          }
+      )
+    }
+)
