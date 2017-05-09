@@ -586,7 +586,7 @@ function _propfind( href, depth, _options, callback ) {
     if ( err ) {
       _on_error( err )
     }
-    if ( !/application\/xml/.test( res.headers['content-type'] ) ) {
+    if ( !/(application|text)\/xml/i.test( res.headers['content-type'] ) ) {
       callback( err, res, null )
     }
     var opt = {
