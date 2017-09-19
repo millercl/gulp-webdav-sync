@@ -2,6 +2,7 @@ npm-debug.log
 node_modules
 .npmrc
 tmp
+test/assets/.htdigest
 test/assets/openssl/certs/
 test/assets/openssl/index.txt
 test/assets/openssl/index.txt.attr
