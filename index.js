@@ -23,10 +23,10 @@
 // in which this software is a necessary component.
 
 var chalk = require( 'chalk' )
-var gutil = require( 'gulp-util' )
 var http = require( 'http' )
 var https = require( 'https' )
 var path = require( 'path' )
+var PluginError = require('plugin-error');
 var Stream = require( 'stream' )
 if ( !Object.assign ) {
   Object.defineProperty(
@@ -300,7 +300,7 @@ module.exports = function () {
          || !glob_watcher.type
          || !glob_watcher.path
        ) {
-      throw new gutil.PluginError( PLUGIN_NAME, 'expected glob-watcher object' )
+      throw new PluginError( PLUGIN_NAME, 'expected glob-watcher object' )
     }
     log.var( 'glob_watcher.path', glob_watcher.path )
     if ( glob_watcher.type === 'deleted' ) {
@@ -679,7 +679,7 @@ function _splice_dest( vinyl_path, base_dir, href, _options ) {
   log.var( '$vinyl_path', vinyl_path )
   log.var( '$base_dir', base_dir )
   if ( vinyl_path.length < base_dir.length ) {
-    error = new gutil.PluginError(
+    error = new PluginError(
         PLUGIN_NAME
       , 'Incoherent Target: options.base too long.\n'
       + '\tpath is ' + chalk.red( vinyl_path ) + '\n'
@@ -703,7 +703,7 @@ function _splice_dest_stem( vinyl_path, base_dir, href, _options ) {
   if ( vinyl_path.substr( 0, base_dir.length ) === base_dir ) {
     dest_stem = path.relative( base_dir, vinyl_path )
   } else {
-    error = new gutil.PluginError(
+    error = new PluginError(
         PLUGIN_NAME
       , 'Incoherent Target: paths diverge.\n'
       + '\tpath is ' + chalk.red( vinyl_path ) + '\n'
